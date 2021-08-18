@@ -18,18 +18,24 @@ package com.acmeair.mongo;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+//import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
+//import com.mongodb.MongoClient;
+//import com.mongodb.MongoClientOptions;
+//import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
@@ -80,8 +86,9 @@ public class ConnectionManager implements MongoConstants {
 			acmeairProps = null;
 		}
 
-		ServerAddress dbAddress = null;
-		MongoClientOptions.Builder options = new MongoClientOptions.Builder();
+//		ServerAddress dbAddress = null;
+//		MongoClientOptions.Builder options = new MongoClientOptions.Builder();
+		MongoClientSettings.Builder options = MongoClientSettings.builder();
 		if (acmeairProps != null) {
 			try {
 				logger.info("Reading mongo.properties file");
@@ -107,29 +114,42 @@ public class ConnectionManager implements MongoConstants {
 					password = prop.getProperty("password");
 				}
 				if (prop.containsKey("connectionsPerHost")) {
-					options.connectionsPerHost(Integer.parseInt(prop.getProperty("connectionsPerHost")));
+//					options.connectionsPerHost(Integer.parseInt(prop.getProperty("connectionsPerHost")));
+					logger.info("connectionsPerHost seems to be deprecated. This configuration is ignored.");
 				}
 				if (prop.containsKey("minConnectionsPerHost")) {
-					options.minConnectionsPerHost(Integer.parseInt(prop.getProperty("minConnectionsPerHost")));
+//					options.minConnectionsPerHost(Integer.parseInt(prop.getProperty("minConnectionsPerHost")));
+					logger.info("minConnectionsPerHost seems to be deprecated. This configuration is ignored.");
 				}
 				if (prop.containsKey("maxWaitTime")) {
-					options.maxWaitTime(Integer.parseInt(prop.getProperty("maxWaitTime")));
+//					options.maxWaitTime(Integer.parseInt(prop.getProperty("maxWaitTime")));
+					options.applyToConnectionPoolSettings(builder ->
+						builder.maxWaitTime(Integer.parseInt(prop.getProperty("maxWaitTime")), TimeUnit.MILLISECONDS));
 				}
 				if (prop.containsKey("connectTimeout")) {
-					options.connectTimeout(Integer.parseInt(prop.getProperty("connectTimeout")));
+//					options.connectTimeout(Integer.parseInt(prop.getProperty("connectTimeout")));
+					options.applyToSocketSettings(builder ->
+						builder.connectTimeout(Integer.parseInt(prop.getProperty("connectTimeout")), TimeUnit.MILLISECONDS));
 				}
 				if (prop.containsKey("socketTimeout")) {
-					options.socketTimeout(Integer.parseInt(prop.getProperty("socketTimeout")));
+//					options.socketTimeout(Integer.parseInt(prop.getProperty("socketTimeout")));
+					options.applyToSocketSettings(builder ->
+						builder.readTimeout(Integer.parseInt(prop.getProperty("socketTimeout")), TimeUnit.MILLISECONDS));
 				}
 				if (prop.containsKey("socketKeepAlive")) {
-					options.socketKeepAlive(Boolean.parseBoolean(prop.getProperty("socketKeepAlive")));
+//					options.socketKeepAlive(Boolean.parseBoolean(prop.getProperty("socketKeepAlive")));
+					if(Boolean.parseBoolean(prop.getProperty("socketKeepAlive"))) {
+						logger.info("socketKeepAlive is deprecated. The configuration for disabling it is ignored.");
+					}
 				}
 				if (prop.containsKey("sslEnabled")) {
-					options.sslEnabled(Boolean.parseBoolean(prop.getProperty("sslEnabled")));
+//					options.sslEnabled(Boolean.parseBoolean(prop.getProperty("sslEnabled")));
+					options.applyToSslSettings(builder -> builder.enabled(true));
 				}
 				if (prop.containsKey("threadsAllowedToBlockForConnectionMultiplier")) {
-					options.threadsAllowedToBlockForConnectionMultiplier(
-							Integer.parseInt(prop.getProperty("threadsAllowedToBlockForConnectionMultiplier")));
+//					options.threadsAllowedToBlockForConnectionMultiplier(
+//							Integer.parseInt(prop.getProperty("threadsAllowedToBlockForConnectionMultiplier")));
+					logger.info("threadsAllowedToBlockForConnectionMultiplier seems to be deprecated. This configuration is ignored.");
 				}
 
 			} catch (Exception ioe) {
@@ -137,7 +157,7 @@ public class ConnectionManager implements MongoConstants {
 			}
 		}
 
-		MongoClientOptions builtOptions = options.build();
+//		MongoClientOptions builtOptions = options.build();
 
 		try {
 			// Check if VCAP_SERVICES exist, and if it does, look up the url from the
@@ -167,55 +187,81 @@ public class ConnectionManager implements MongoConstants {
 					logger.info("VCAP_SERVICES existed, but a MongoLAB or MongoDB by COMPOST service was "
 							+ "not definied. Trying DB resource");
 					// VCAP_SERVICES don't exist, so use the DB resource
-					dbAddress = new ServerAddress(hostname, port);
+//					dbAddress = new ServerAddress(hostname, port);
+					ServerAddress dbAddress = new ServerAddress(hostname, port);
+					options.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(dbAddress)));
 
 					// If username & password exists, connect DB with username & password
 					if ((username == null) || (password == null)) {
-						mongoClient = new MongoClient(dbAddress, builtOptions);
+//						mongoClient = new MongoClient(dbAddress, builtOptions);
 					} else {
-						List<MongoCredential> credentials = new ArrayList<>();
-						credentials.add(MongoCredential.createCredential(username, dbname, password.toCharArray()));
-						mongoClient = new MongoClient(dbAddress, credentials, builtOptions);
+//						List<MongoCredential> credentials = new ArrayList<>();
+//						credentials.add(MongoCredential.createCredential(username, dbname, password.toCharArray()));
+						options.credential(MongoCredential.createCredential(username, dbname, password.toCharArray()));
+//						mongoClient = new MongoClient(dbAddress, credentials, builtOptions);
 					}
+					mongoClient = MongoClients.create(options.build());
 				} else {
 					JsonNode mongoService = mongoServiceArray.get(0);
 					JsonNode credentials = mongoService.get("credentials");
 					String url = credentials.get("url").asText();
 					logger.fine("service url = " + url);
-					MongoClientURI mongoUri = new MongoClientURI(url, options);
-					mongoClient = new MongoClient(mongoUri);
+//					MongoClientURI mongoUri = new MongoClientURI(url, options);
+					ConnectionString mongoUri = new ConnectionString(url);
+//					mongoClient = new MongoClient(mongoUri);
+					mongoClient = MongoClients.create(url);
 					dbname = mongoUri.getDatabase();
 
 				}
 			} else {
 
 				// VCAP_SERVICES don't exist, so use the DB resource
-				dbAddress = new ServerAddress(hostname, port);
+//				dbAddress = new ServerAddress(hostname, port);
+				ServerAddress dbAddress = new ServerAddress(hostname, port);
+				options.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(dbAddress)));
 
 				// If username & password exists, connect DB with username & password
 				if ((username == null) || (password == null)) {
-					mongoClient = new MongoClient(dbAddress, builtOptions);
+//					mongoClient = new MongoClient(dbAddress, builtOptions);
 				} else {
-					List<MongoCredential> credentials = new ArrayList<>();
-					credentials.add(MongoCredential.createCredential(username, dbname, password.toCharArray()));
-					mongoClient = new MongoClient(dbAddress, credentials, builtOptions);
+//					List<MongoCredential> credentials = new ArrayList<>();
+//					credentials.add(MongoCredential.createCredential(username, dbname, password.toCharArray()));
+					options.credential(MongoCredential.createCredential(username, dbname, password.toCharArray()));
+//					mongoClient = new MongoClient(dbAddress, credentials, builtOptions);
 				}
+				mongoClient = MongoClients.create(options.build());
 			}
 
 			db = mongoClient.getDatabase(dbname);
-			logger.info("#### Mongo DB Server " + mongoClient.getAddress().getHost() + " ####");
-			logger.info("#### Mongo DB Port " + mongoClient.getAddress().getPort() + " ####");
+//			logger.info("#### Mongo DB Server " + mongoClient.getAddress().getHost() + " ####");
+//			logger.info("#### Mongo DB Port " + mongoClient.getAddress().getPort() + " ####");
+//			logger.info("#### Mongo DB is created with DB name " + dbname + " ####");
+//			logger.info("#### MongoClient Options ####");
+//			logger.info("maxConnectionsPerHost : " + builtOptions.getConnectionsPerHost());
+//			logger.info("minConnectionsPerHost : " + builtOptions.getMinConnectionsPerHost());
+//			logger.info("maxWaitTime : " + builtOptions.getMaxWaitTime());
+//			logger.info("connectTimeout : " + builtOptions.getConnectTimeout());
+//			logger.info("socketTimeout : " + builtOptions.getSocketTimeout());
+//			logger.info("socketKeepAlive : " + builtOptions.isSocketKeepAlive());
+//			logger.info("sslEnabled : " + builtOptions.isSslEnabled());
+//			logger.info("threadsAllowedToBlockForConnectionMultiplier : "
+//					+ builtOptions.getThreadsAllowedToBlockForConnectionMultiplier());
+//			logger.info("Complete List : " + builtOptions.toString());
+
+			MongoClientSettings builtOptions = options.build();
+			List<ServerAddress> hostAddrs =  mongoClient.getClusterDescription().getClusterSettings().getHosts();
+			logger.info("#### Mongo DB Server " + String.join(",", (String[])(hostAddrs.stream().map(adr -> adr.getHost()).toArray())) + " ####");
+			logger.info("#### Mongo DB Port " + String.join(",", (String[])(hostAddrs.stream().map(adr -> String.valueOf(adr.getPort())).toArray())) + " ####");
 			logger.info("#### Mongo DB is created with DB name " + dbname + " ####");
 			logger.info("#### MongoClient Options ####");
-			logger.info("maxConnectionsPerHost : " + builtOptions.getConnectionsPerHost());
-			logger.info("minConnectionsPerHost : " + builtOptions.getMinConnectionsPerHost());
-			logger.info("maxWaitTime : " + builtOptions.getMaxWaitTime());
-			logger.info("connectTimeout : " + builtOptions.getConnectTimeout());
-			logger.info("socketTimeout : " + builtOptions.getSocketTimeout());
-			logger.info("socketKeepAlive : " + builtOptions.isSocketKeepAlive());
-			logger.info("sslEnabled : " + builtOptions.isSslEnabled());
-			logger.info("threadsAllowedToBlockForConnectionMultiplier : "
-					+ builtOptions.getThreadsAllowedToBlockForConnectionMultiplier());
+			logger.info("maxConnectionsPerHost : ***Deprecated***");
+			logger.info("minConnectionsPerHost : ***Deprecated***");
+			logger.info("maxWaitTime : " + builtOptions.getConnectionPoolSettings().getMaxWaitTime(TimeUnit.MILLISECONDS));
+			logger.info("connectTimeout : " + builtOptions.getSocketSettings().getConnectTimeout(TimeUnit.MILLISECONDS));
+			logger.info("socketTimeout : " + builtOptions.getSocketSettings().getReadTimeout(TimeUnit.MILLISECONDS));
+			logger.info("socketKeepAlive : ***Deprecated***");
+			logger.info("sslEnabled : " + builtOptions.getSslSettings().isEnabled());
+			logger.info("threadsAllowedToBlockForConnectionMultiplier : ***Deprecated***");
 			logger.info("Complete List : " + builtOptions.toString());
 
 		} catch (Exception e) {
