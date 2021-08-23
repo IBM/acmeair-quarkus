@@ -147,7 +147,8 @@ public class BookingServiceImpl implements BookingService, MongoConstants {
 
   @Override
   public Long count() {
-    return booking.count();
+//      return booking.count();
+      return booking.countDocuments();
   }
 
   @Override
