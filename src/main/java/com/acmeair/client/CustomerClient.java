@@ -21,22 +21,30 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+//import org.springframework.http.HttpEntity;
+//import org.springframework.http.HttpHeaders;
+//import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+//import org.springframework.util.LinkedMultiValueMap;
+//import org.springframework.util.MultiValueMap;
+//import org.springframework.web.client.RestTemplate;
 
 import com.acmeair.securityutils.SecurityUtils;
 
 @Component
 public class CustomerClient {
     
-    private static RestTemplate restTemplate = new RestTemplate();
+//    private static RestTemplate restTemplate = new RestTemplate();
+    private static Client client = ClientBuilder.newClient();
     private static final String UPDATE_REWARD_PATH = "/updateCustomerTotalMiles";
     
     /**
@@ -55,10 +63,11 @@ public class CustomerClient {
 		String customerUrl = "http://" + CUSTOMER_SERVICE_LOC + UPDATE_REWARD_PATH;
 		String customerParameters = "miles=" + miles + "&customerid=" + customerId;
 		
-		HttpHeaders headers = new HttpHeaders();
+//		HttpHeaders headers = new HttpHeaders();
+		MultivaluedMap<String, Object> headers = new MultivaluedHashMap();
 
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		//headers.setAccept(java.util.Arrays.asList(MediaType.APPLICATION_JSON));
+//		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		// //headers.setAccept(java.util.Arrays.asList(MediaType.APPLICATION_JSON));
 
 		if (secUtils.secureServiceCalls()) {
 
@@ -76,19 +85,29 @@ public class CustomerClient {
 				throw new RuntimeException(e);
 			}
 
-			headers.set("acmeair-id", customerId);
-			headers.set("acmeair-date", date.toString());
-			headers.set("acmeair-sig-body", sigBody);
-			headers.set("acmeair-signature", signature);
+//			headers.set("acmeair-id", customerId);
+//			headers.set("acmeair-date", date.toString());
+//			headers.set("acmeair-sig-body", sigBody);
+//			headers.set("acmeair-signature", signature);
+			headers.putSingle("acmeair-id", customerId);
+			headers.putSingle("acmeair-date", date.toString());
+			headers.putSingle("acmeair-sig-body", sigBody);
+			headers.putSingle("acmeair-signature", signature);
 		}
 
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+//		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		MultivaluedMap<String, String> map = new MultivaluedHashMap<String, String>();
 		map.add("miles", miles);
 		map.add("customerid", customerId);
 
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+//		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		Entity<Form> request = Entity.form(map);
 
-		UpdateTotalMilesResult result = restTemplate.postForObject(customerUrl, request, UpdateTotalMilesResult.class);
+//		UpdateTotalMilesResult result = restTemplate.postForObject(customerUrl, request, UpdateTotalMilesResult.class);
+		UpdateTotalMilesResult result = client.target(customerUrl)
+		                                      .request()
+											  .headers(headers)
+											  .post(request, UpdateTotalMilesResult.class);
 		return result.total_miles;
 	}
 }

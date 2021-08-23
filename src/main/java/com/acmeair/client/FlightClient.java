@@ -21,22 +21,30 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+//import org.springframework.http.HttpEntity;
+//import org.springframework.http.HttpHeaders;
+//import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+//import org.springframework.util.LinkedMultiValueMap;
+//import org.springframework.util.MultiValueMap;
+//import org.springframework.web.client.RestTemplate;
 
 import com.acmeair.securityutils.SecurityUtils;
 
 @Component
 public class FlightClient {
     
-    private static RestTemplate restTemplate = new RestTemplate();
+//    private static RestTemplate restTemplate = new RestTemplate();
+    private static Client client = ClientBuilder.newClient();
     private static final String GET_REWARD_PATH = "/getrewardmiles";
 
     @Value("${flight.service:localhost:6379/customer}")
@@ -55,9 +63,10 @@ public class FlightClient {
 		String flightUrl = "http://" + FLIGHT_SERVICE_LOC + GET_REWARD_PATH;
 		String flightParameters = "flightSegment=" + flightSegId;
 		
-		HttpHeaders headers = new HttpHeaders();
+//		HttpHeaders headers = new HttpHeaders();
+		MultivaluedMap<String, Object> headers = new MultivaluedHashMap();
 
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
 		if (secUtils.secureServiceCalls()) {
 
@@ -75,19 +84,29 @@ public class FlightClient {
 				throw new RuntimeException(e);
 			}
 
-			headers.set("acmeair-id", customerId);
-			headers.set("acmeair-date", date.toString());
-			headers.set("acmeair-sig-body", sigBody);
-			headers.set("acmeair-signature", signature);
+//			headers.set("acmeair-id", customerId);
+//			headers.set("acmeair-date", date.toString());
+//			headers.set("acmeair-sig-body", sigBody);
+//			headers.set("acmeair-signature", signature);
+			headers.putSingle("acmeair-id", customerId);
+			headers.putSingle("acmeair-date", date.toString());
+			headers.putSingle("acmeair-sig-body", sigBody);
+			headers.putSingle("acmeair-signature", signature);
 		}
 
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+//		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		MultivaluedMap<String, String> map = new MultivaluedHashMap<String, String>();
 		map.add("flightSegment", flightSegId);
 
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+//		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		Entity<Form> request = Entity.form(map);
 
-		FlightServiceGetRewardsResult result = restTemplate.postForObject(flightUrl, request,
-				FlightServiceGetRewardsResult.class);
+//		FlightServiceGetRewardsResult result = restTemplate.postForObject(flightUrl, request,
+//				FlightServiceGetRewardsResult.class);
+		FlightServiceGetRewardsResult result = client.target(flightUrl)
+		                                             .request()
+													 .headers(headers)
+													 .post(request, FlightServiceGetRewardsResult.class);
 
 		Long miles = result.miles;
 		
