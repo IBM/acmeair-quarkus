@@ -17,10 +17,10 @@ package com.acmeair;
 
 import java.util.List;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+//import org.springframework.boot.SpringApplication;
+//import org.springframework.boot.autoconfigure.SpringBootApplication;
+//import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+//import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 //import org.springframework.format.FormatterRegistry;
 //import org.springframework.http.converter.HttpMessageConverter;
 //import org.springframework.validation.MessageCodesResolver;
@@ -33,16 +33,23 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 //import org.springframework.web.servlet.config.annotation.CorsRegistry;
 //import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 //import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+//import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 //import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 //import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 //import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-public class BookingServiceQuarkusApplication implements WebMvcConfigurer {
-	public static void main(String[] args) {
-		SpringApplication.run(BookingServiceQuarkusApplication.class, args);
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.annotations.QuarkusMain;
+
+//@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+//public class BookingServiceQuarkusApplication implements WebMvcConfigurer {
+@QuarkusMain
+public class BookingServiceQuarkusApplication {
+//    public static void main(String[] args) {
+//		SpringApplication.run(BookingServiceQuarkusApplication.class, args);
+    public static void main(String... args) {
+        Quarkus.run(args);
 	}
 
 //	@Override
@@ -94,10 +101,10 @@ public class BookingServiceQuarkusApplication implements WebMvcConfigurer {
 //	public void configureMessageConverters(List<HttpMessageConverter<?>> arg0) {
 //	}
 
-	@Override
-	public void configurePathMatch(PathMatchConfigurer pmc) {
-		pmc.setUseRegisteredSuffixPatternMatch(true);
-	}
+//	@Override
+//	public void configurePathMatch(PathMatchConfigurer pmc) {
+//		pmc.setUseRegisteredSuffixPatternMatch(true);
+//	}
 
 //	@Override
 //	public void configureViewResolvers(ViewResolverRegistry arg0) {
