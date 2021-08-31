@@ -11,13 +11,13 @@
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/acmeair-bookingservice-quarkus
+# docker run -i --rm -p 9080:9080 quarkus/acmeair-bookingservice-quarkus
 #
 ###
 FROM quay.io/quarkus/quarkus-distroless-image:1.0
 COPY target/*-runner /application
 
-EXPOSE 8080
+EXPOSE 9080 9443
 USER nonroot
 
 CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
