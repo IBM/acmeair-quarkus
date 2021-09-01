@@ -41,7 +41,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
+//import com.mongodb.util.JSON;
 
 @Component
 public class FlightServiceImpl extends FlightService implements  MongoConstants {
@@ -68,17 +68,20 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
 
   @Override
   public Long countFlights() {
-    return flight.count();
+//    return flight.count();
+    return flight.countDocuments();
   }
   
   @Override
   public Long countFlightSegments() {
-    return flightSegment.count();
+//    return flightSegment.count();
+    return flightSegment.countDocuments();
   }
   
   @Override
   public Long countAirports() {
-    return airportCodeMapping.count();
+//    return airportCodeMapping.count();
+    return airportCodeMapping.countDocuments();
   }
   
   protected String getFlight(String flightId, String segmentId) {
@@ -154,7 +157,8 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
           tempDoc.append("scheduledDepartureTime", deptTime.toString());
           tempDoc.remove("scheduledArrivalTime");
           tempDoc.append("scheduledArrivalTime", arvTime.toString());
-          tempDoc.append("flightSegment", JSON.parse(segment));
+//          tempDoc.append("flightSegment", JSON.parse(segment));
+          tempDoc.append("flightSegment", BasicDBObject.parse(segment));
           
           if (logger.isLoggable(Level.FINE)) {
             logger.fine("getFlghtBySegment after : " + tempDoc.toJson());
