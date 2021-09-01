@@ -44,7 +44,6 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 
 //@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 //public class BookingServiceQuarkusApplication implements WebMvcConfigurer {
-@QuarkusMain
 public class BookingServiceQuarkusApplication {
 //    public static void main(String[] args) {
 //		SpringApplication.run(BookingServiceQuarkusApplication.class, args);
