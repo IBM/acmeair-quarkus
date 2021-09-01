@@ -27,7 +27,7 @@ acmeair-nginx:
     - acmeair-authservice-springboot
     - acmeair-bookingservice-quarkus
     - acmeair-customerservice-quarkus
-    - acmeair-flightservice-springboot
+    - acmeair-flightservice-quarkus
 
 acmeair-mainservice-springboot:
   container_name: acmeair-mainservice-springboot
@@ -94,10 +94,21 @@ acmeair-customerservice-quarkus:
     - acmeair-customer-db-sb
   privileged: true
 
-acmeair-flightservice-springboot:
-  container_name: acmeair-flightservice-springboot
+#acmeair-flightservice-springboot:
+#  container_name: acmeair-flightservice-springboot
+#  net: ${NETWORK}
+#  build: ../acmeair-flightservice-springboot/
+#  environment:
+#    - LICENSE=accept
+#    - MONGO_HOST=acmeair-flight-db-sb
+#  volumes_from:
+#    - acmeair-flight-db-sb
+#  privileged: true
+
+acmeair-flightservice-quarkus:
+  container_name: acmeair-flightservice-quarkus
   net: ${NETWORK}
-  build: ../acmeair-flightservice-springboot/
+  build: ../acmeair-flightservice-quarkus/
   environment:
     - LICENSE=accept
     - MONGO_HOST=acmeair-flight-db-sb
