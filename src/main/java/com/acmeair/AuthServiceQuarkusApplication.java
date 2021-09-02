@@ -45,10 +45,10 @@ public class AuthServiceQuarkusApplication implements WebMvcConfigurer {
 		SpringApplication.run(AuthServiceQuarkusApplication.class, args);
 	}
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new CookieInterceptor()).addPathPatterns("/login");
-	}
+//	@Override
+//	public void addInterceptors(InterceptorRegistry registry) {
+//		registry.addInterceptor(new CookieInterceptor()).addPathPatterns("/login");
+//	}
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> arg0) {
