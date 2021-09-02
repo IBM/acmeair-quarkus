@@ -1,54 +1,66 @@
-# acmeair-mainservice-quarkus Project
+# AcmeAir MicroServices Quarkus
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-## Running the application in dev mode
+### Usage Instructions
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
-```
+##### Clone Git Repos
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+    git clone https://github.ibm.com/trl-quarkus/acmeair-mainservice-quarkus.git
+    git clone https://github.ibm.com/trl-quarkus/acmeair-authservice-quarkus.git
+    git clone https://github.ibm.com/trl-quarkus/acmeair-bookingservice-quarkus.git
+    git clone https://github.ibm.com/trl-quarkus/acmeair-customerservice-quarkus.git
+    git clone https://github.ibm.com/trl-quarkus/acmeair-flightservice-quarkus.git
 
-## Packaging and running the application
+##### Building the application
+  
+      cd <acmeair-mainservice-GIT-PATH>  
+      mvn -DskipTests clean package
+    
+      cd <acmeair-authservice-GIT-PATH>  
+      mvn -DskipTests clean package
+    
+      cd <acmeair-bookingservice-GIT-PATH>  
+      mvn -DskipTests clean package
+    
+      cd <acmeair-customerservice-GIT-PATH>  
+      mvn -DskipTests clean package
+    
+      cd <acmeair-flightservice-GIT-PATH>  
+      mvn -DskipTests clean package
+  
+## Docker Instructions
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Prereq: [Install Docker, docker-compose, and start Docker daemon on your local machine](https://docs.docker.com/installation/)
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
+1. Create a symbolic link to Dockerfile in each repository
+ * for d in acmeair-*-quarkus; do (cd $d; ln -s src/main/docker/Dockerfile.jvm Dockerfile); done
+2. cd acmeair-mainservice-quarkus
+3. Create docker network
+ * docker network create --driver bridge my-net
+4. Build/Start Containers. This will build all the micro-services, mongo db instances, and an nginx proxy.
+    * docker-compose build
+    * NETWORK=my-net docker-compose up
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+5. Go to http://docker_machine_ip/acmeair
+6. Go to the Configuration Page and Load the Database
 
 ## Creating a native executable
 
+Although we have not tested native execution of the services, you can try it by building a native binary
+for each repository and re-creating docker images for the native binary after switching the symbolic link of Dockefile 
+to `src/main/docker/Dockerfile.native`.
+
 You can create a native executable using: 
 ```shell script
-./mvnw package -Pnative
+./mvnw -DskipTests package -Pnative
 ```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
 ```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
+./mvnw -DskipTests package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/acmeair-mainservice-quarkus-2.1.1-SNAPSHOT-runner`
-
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
-
-## Provided Code
-
-### RESTEasy JAX-RS
-
-Easily start your RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
