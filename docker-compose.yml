@@ -23,16 +23,24 @@ acmeair-nginx:
   volumes:
     - /www/public
   volumes_from:
-    - acmeair-mainservice-springboot
+    - acmeair-mainservice-quarkus
     - acmeair-authservice-quarkus
     - acmeair-bookingservice-quarkus
     - acmeair-customerservice-quarkus
     - acmeair-flightservice-quarkus
 
-acmeair-mainservice-springboot:
-  container_name: acmeair-mainservice-springboot
+#acmeair-mainservice-springboot:
+#  container_name: acmeair-mainservice-springboot
+#  net: ${NETWORK}
+#  build: ../acmeair-mainservice-springboot/
+#  environment:
+#    - LICENSE=accept
+#  privileged: true
+
+acmeair-mainservice-quarkus:
+  container_name: acmeair-mainservice-quarkus
   net: ${NETWORK}
-  build: ../acmeair-mainservice-springboot/
+  build: ../acmeair-mainservice-quarkus/
   environment:
     - LICENSE=accept
   privileged: true
