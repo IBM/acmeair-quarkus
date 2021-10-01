@@ -41,7 +41,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import io.smallrye.jwt.algorithm.SignatureAlgorithm;
 import io.smallrye.jwt.auth.principal.DefaultJWTParser;
 import io.smallrye.jwt.auth.principal.JWTAuthContextInfo;
-import io.smallrye.jwt.build.spi.JwtProvider;
+import io.smallrye.jwt.build.Jwt;
 
 @Component
 public class SecurityUtils {
@@ -90,7 +90,7 @@ public class SecurityUtils {
 //			token = JWT.create().withSubject(customerid).sign(algorithm);
 
 			// signWithSecret() uses HS256 algorithm by default
-			token = JwtProvider.provider().claims().subject(customerid).signWithSecret(secretKey);
+			token = Jwt.claims().subject(customerid).signWithSecret(secretKey);
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
