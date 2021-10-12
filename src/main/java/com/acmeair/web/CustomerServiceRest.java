@@ -19,8 +19,20 @@ package com.acmeair.web;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+//import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,14 +50,17 @@ import com.acmeair.web.dto.CustomerInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RestController
-@RequestMapping("/")
+//@RestController
+//@RequestMapping("/")
+@Path("/")
 public class CustomerServiceRest {
 
-  @Autowired
+//  @Autowired
+  @Inject
   CustomerService customerService;
 
-  @Autowired
+//  @Autowired
+  @Inject
   private SecurityUtils secUtils;
 
   private static final Logger logger = Logger.getLogger(CustomerServiceRest.class.getName());
@@ -53,9 +68,13 @@ public class CustomerServiceRest {
   /**
    * Get customer info.
    */
-  @RequestMapping(value = "/byid/{custid}")
-  public String getCustomer(@PathVariable("custid") String customerid,
-      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+//  @RequestMapping(value = "/byid/{custid}")
+//  PUBLIC STRING GETCUSTOMER(@PATHVARIABLE("CUSTID") STRING CUSTOMERID,
+//      @COOKIEVALUE(VALUE = "JWT_TOKEN", REQUIRED = FALSE) STRING JWTTOKEN) {
+  @GET
+  @Path("/byid/{custid}")
+  public String getCustomer(@PathParam("custid") String customerid,
+      @CookieParam("jwt_token") String jwtToken) {
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("getCustomer : userid " + customerid);
     }
@@ -78,9 +97,13 @@ public class CustomerServiceRest {
   /**
    * Update customer.
    */
-  @RequestMapping(value = "/byid/{custid}", method = RequestMethod.POST)
-  public String putCustomer(@RequestBody CustomerInfo customer,
-      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+//  @RequestMapping(value = "/byid/{custid}", method = RequestMethod.POST)
+//  public String putCustomer(@RequestBody CustomerInfo customer,
+//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+  @POST
+  @Path("/byid/{custid}")
+  public String putCustomer(CustomerInfo customer,
+      @CookieParam("jwt_token") String jwtToken) {
 
     String username = customer.get_id();
 
@@ -110,10 +133,17 @@ public class CustomerServiceRest {
   /**
    * Validate user/password.
    */
-  @RequestMapping(value = "/validateid", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-  public ValidateCustomerResponse validateCustomer(@RequestHeader(name = "acmeair-id", required = false) String headerId,
-      @RequestHeader(name = "acmeair-date", required = false) String headerDate, @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody,
-      @RequestHeader(name = "acmeair-signature", required = false) String headerSig, @RequestParam String login, @RequestParam String password) {
+//  @RequestMapping(value = "/validateid", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
+//  public ValidateCustomerResponse validateCustomer(@RequestHeader(name = "acmeair-id", required = false) String headerId,
+//          @RequestHeader(name = "acmeair-date", required = false) String headerDate, @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody,
+//          @RequestHeader(name = "acmeair-signature", required = false) String headerSig, @RequestParam String login, @RequestParam String password) {
+  @POST
+  @Path("/validateid")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces(MediaType.APPLICATION_JSON)
+  public ValidateCustomerResponse validateCustomer(@HeaderParam("acmeair-id") String headerId,
+      @HeaderParam("acmeair-date") String headerDate, @HeaderParam("acmeair-sig-body") String headerSigBody,
+      @HeaderParam("acmeair-signature") String headerSig, @FormParam("login") String login, @FormParam("password") String password) {
 
 
     if (logger.isLoggable(Level.FINE)) {
@@ -138,11 +168,19 @@ public class CustomerServiceRest {
   /**
    * Update reward miles.
    */
-  @RequestMapping(value = "/updateCustomerTotalMiles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-  public UpdateMilesResult updateCustomerTotalMiles(@RequestHeader(name = "acmeair-id", required = false) String headerId,
-      @RequestHeader(name = "acmeair-date", required = false) String headerDate, @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody,
-      @RequestHeader(name = "acmeair-signature", required = false) String headerSig,
-      @RequestParam String customerid,  @RequestParam Long miles) {
+//  @RequestMapping(value = "/updateCustomerTotalMiles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
+//  public UpdateMilesResult updateCustomerTotalMiles(@RequestHeader(name = "acmeair-id", required = false) String headerId,
+//      @RequestHeader(name = "acmeair-date", required = false) String headerDate, @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody,
+//      @RequestHeader(name = "acmeair-signature", required = false) String headerSig,
+//      @RequestParam String customerid,  @RequestParam Long miles) {
+  @POST
+  @Path(value = "/updateCustomerTotalMiles")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces(MediaType.APPLICATION_JSON)
+  public UpdateMilesResult updateCustomerTotalMiles(@HeaderParam("acmeair-id") String headerId,
+      @HeaderParam("acmeair-date") String headerDate, @HeaderParam("acmeair-sig-body") String headerSigBody,
+      @HeaderParam("acmeair-signature") String headerSig,
+      @FormParam("customerid") String customerid,  @FormParam("miles") Long miles) {
 
     try {
       if (secUtils.secureServiceCalls()) {
@@ -187,7 +225,8 @@ public class CustomerServiceRest {
     }
   }
 
-  @RequestMapping("/")
+//  @RequestMapping("/")
+  @Path("/")
   public String checkStatus() {
     return "OK";
 
