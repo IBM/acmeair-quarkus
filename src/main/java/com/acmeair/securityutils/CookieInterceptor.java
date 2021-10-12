@@ -15,41 +15,51 @@
 *******************************************************************************/
 package com.acmeair.securityutils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpFilter;
+//import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletResponse;
+//import javax.servlet.http.HttpFilter;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-
-//import org.springframework.ui.ModelMap;
-//import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 //import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 
 import com.acmeair.web.AuthServiceRest;
 
 //public class CookieInterceptor extends HandlerInterceptorAdapter {
-@SuppressWarnings("serial")
-public class CookieInterceptor extends HttpFilter {
+@Provider
+public class CookieInterceptor implements ContainerResponseFilter {
 	@Override
 //    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 //            ModelAndView modelAndView) throws Exception {
-	protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) 
-	        throws IOException, ServletException {
+	public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
 //		super.postHandle(request, response, handler, modelAndView);
-	  chain.doFilter(request, response);
-		
-//		ModelMap modelMap = modelAndView.getModelMap();
-//		String token = (String) modelMap.getOrDefault("token", "");
-//		String login = (String) modelMap.getOrDefault("login", "");
-      String token = (String) request.getAttribute("token");
-      String login = (String) request.getAttribute("login");
-      if(token == null)  token = "";
-      if(login == null)  login = "";
 
-      response.addHeader("Set-Cookie", AuthServiceRest.JWT_COOKIE_NAME + "=" + token + "; Path=/");
-      response.addHeader("Set-Cookie", AuthServiceRest.USER_COOKIE_NAME + "=" + login + "; Path=/");
+        if(!request.getUriInfo().getPath().equals("/login")) {
+            return;
+        }
+
+        ModelAndView modelAndView = (ModelAndView)response.getEntity();
+		ModelMap modelMap = modelAndView.getModelMap();
+		String token = (String) modelMap.getOrDefault("token", "");
+		String login = (String) modelMap.getOrDefault("login", "");
+
+//      response.addHeader("Set-Cookie", AuthServiceRest.JWT_COOKIE_NAME + "=" + token + "; Path=/");
+//      response.addHeader("Set-Cookie", AuthServiceRest.USER_COOKIE_NAME + "=" + login + "; Path=/");
+      MultivaluedMap<String, Object> resHeaders = response.getHeaders();
+      resHeaders.add("Set-Cookie", AuthServiceRest.JWT_COOKIE_NAME + "=" + token + "; Path=/");
+      resHeaders.add("Set-Cookie", AuthServiceRest.USER_COOKIE_NAME + "=" + login + "; Path=/");
+
+      // Rewrite response entity here as the View.render() of the ModelAndView instance returned from AuthServiceRest
+      // would do because Quarkus'es dispatcher does not invoke render()
+      response.setEntity("logged in", null, MediaType.TEXT_PLAIN_TYPE);
 	}
 }

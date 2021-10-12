@@ -21,15 +21,23 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.MediaType;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestMethod;
+//import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 
@@ -37,8 +45,9 @@ import com.acmeair.client.CustomerClient;
 import com.acmeair.securityutils.ForbiddenException;
 import com.acmeair.securityutils.SecurityUtils;
 
-@RestController
-@RequestMapping("/")
+//@RestController
+//@RequestMapping("/")
+@Path("/")
 public class AuthServiceRest {
 
 	private static final Logger logger = Logger.getLogger(AuthServiceRest.class.getName());
@@ -48,18 +57,25 @@ public class AuthServiceRest {
 
 	
 
-	@Autowired
+//	@Autowired
+	@Inject
 	private CustomerClient customerClient;
 
-	@Autowired
+//	@Autowired
+	@Inject
 	private SecurityUtils secUtils;
 
 	/**
 	 * Login with username/password.
 	 * 
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ModelAndView login(@RequestParam String login, @RequestParam String password) {
+//	@RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//  public ModelAndView login(@RequestParam("login") String login, @RequestParam("password") String password) {
+    @POST
+	@Path("/login")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public ModelAndView login(@FormParam("login") String login, @FormParam("password") String password) {
 		// Test: curl -d 'login=user1' -d 'password=letmein' http://localhost:8080/login
 		try {
 			
@@ -103,7 +119,8 @@ public class AuthServiceRest {
 		}
 	}
 
-	@RequestMapping("/")
+//	@RequestMapping("/")
+    @Path("/")
 	public String checkStatus() {
 		return "OK";
 	}
