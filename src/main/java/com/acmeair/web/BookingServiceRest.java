@@ -19,14 +19,24 @@ package com.acmeair.web;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
+
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.MediaType;
+//import org.springframework.web.bind.annotation.CookieValue;
+//import org.springframework.web.bind.annotation.PathVariable;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestMethod;
+//import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RestController;
 
 import com.acmeair.securityutils.ForbiddenException;
 import com.acmeair.securityutils.SecurityUtils;
@@ -34,17 +44,21 @@ import com.acmeair.service.BookingService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RestController
-@RequestMapping("/")
+//@RestController
+//@RequestMapping("/")
+@Path("/")
 public class BookingServiceRest {
 
-  @Autowired
+//  @Autowired
+  @Inject
   BookingService bs;
 
-  @Autowired
+//  @Autowired
+  @Inject
   private SecurityUtils secUtils;
 
-  @Autowired
+//  @Autowired
+  @Inject
   private RewardTracker rewardTracker;
 
   private static final Logger logger = Logger.getLogger(BookingServiceRest.class.getName());
@@ -53,14 +67,24 @@ public class BookingServiceRest {
   /**
    * Book flights.
    */
-  @RequestMapping(value = "/bookflights", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public String bookFlights(@RequestParam String userid,
-      @RequestParam String toFlightId,
-      @RequestParam String toFlightSegId,
-      @RequestParam String retFlightId,
-      @RequestParam String retFlightSegId,
-      @RequestParam boolean oneWayFlight,
-      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+//  @RequestMapping(value = "/bookflights", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//  public String bookFlights(@RequestParam String userid,
+//      @RequestParam String toFlightId,
+//      @RequestParam String toFlightSegId,
+//      @RequestParam String retFlightId,
+//      @RequestParam String retFlightSegId,
+//      @RequestParam boolean oneWayFlight,
+//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+  @POST
+  @Path("/bookflights")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public String bookFlights(@FormParam("userid") String userid,
+      @FormParam("toFlightId") String toFlightId,
+      @FormParam("toFlightSegId") String toFlightSegId,
+      @FormParam("retFlightId") String retFlightId,
+      @FormParam("retFlightSegId") String retFlightSegId,
+      @FormParam("oneWayFlight") boolean oneWayFlight,
+      @CookieParam("jwt_token") String jwtToken) {
     try {
 
       // make sure the user isn't trying to bookflights for someone else
@@ -96,9 +120,13 @@ public class BookingServiceRest {
   /**
    * Get Booking by Number.
    */
-  @RequestMapping("/bybookingnumber/{userid}/{number}")
-  public String getBookingByNumber(@PathVariable("number") String number, @PathVariable("userid") String userid,
-      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+//  @RequestMapping("/bybookingnumber/{userid}/{number}")
+//  public String getBookingByNumber(@PathVariable("number") String number, @PathVariable("userid") String userid,
+//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+  @GET
+  @Path("/bybookingnumber/{userid}/{number}")
+  public String getBookingByNumber(@PathParam("number") String number, @PathParam("userid") String userid,
+      @CookieParam("jwt_token") String jwtToken) {
     try {
       // make sure the user isn't trying to bookflights for someone else
       if (secUtils.secureUserCalls()  && !secUtils.validateJwt(userid, jwtToken)) {
@@ -114,9 +142,13 @@ public class BookingServiceRest {
   /**
    * Get bookins for a customer.
    */
-  @RequestMapping("/byuser/{user}")
-  public String getBookingsByUser(@PathVariable("user") String user,
-      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+//  @RequestMapping("/byuser/{user}")
+//  public String getBookingsByUser(@PathVariable("user") String user,
+//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+  @GET
+  @Path("/byuser/{user}")
+  public String getBookingsByUser(@PathParam("user") String user,
+      @CookieParam("jwt_token") String jwtToken) {
 
     try {
 
@@ -136,9 +168,14 @@ public class BookingServiceRest {
   /**
    * Cancel bookings.
    */
-  @RequestMapping(value = "/cancelbooking", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public String cancelBookingsByNumber(@RequestParam String number, @RequestParam String userid,
-      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+//  @RequestMapping(value = "/cancelbooking", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//  public String cancelBookingsByNumber(@RequestParam String number, @RequestParam String userid,
+//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
+  @POST
+  @Path("/cancelbooking")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public String cancelBookingsByNumber(@FormParam("number") String number, @FormParam("userid") String userid,
+      @CookieParam("jwt_token") String jwtToken) {
     try {
      
       // make sure the user isn't trying to bookflights for someone else
@@ -171,7 +208,8 @@ public class BookingServiceRest {
     }
   }
 
-  @RequestMapping("/")
+//  @RequestMapping("/")
+  @Path("/")
   public String checkStatus() {
     return "OK";
   }
