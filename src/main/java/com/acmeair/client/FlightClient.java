@@ -29,6 +29,8 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.jboss.resteasy.client.jaxrs.engines.URLConnectionEngine;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.http.HttpEntity;
@@ -45,7 +47,12 @@ import com.acmeair.securityutils.SecurityUtils;
 public class FlightClient {
     
 //    private static RestTemplate restTemplate = new RestTemplate();
-    private static Client client = ClientBuilder.newClient();
+//    private static Client client = ClientBuilder.newClient();
+//  private static Client client = new ResteasyClientBuilderImpl().build();
+  private static Client client = new ResteasyClientBuilderImpl()
+//                                      .httpEngine(new VertxClientHttpEngine)
+                                      .httpEngine(new URLConnectionEngine())
+                                      .build();
     private static final String GET_REWARD_PATH = "/getrewardmiles";
 
     @Value("${flight.service:localhost:6379/customer}")
