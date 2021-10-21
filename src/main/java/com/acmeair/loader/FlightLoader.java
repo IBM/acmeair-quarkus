@@ -25,7 +25,9 @@ import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.acmeair.AirportCodeMapping;
@@ -36,7 +38,8 @@ public class FlightLoader {
 
   private static final int MAX_FLIGHTS_PER_SEGMENT = 5;
 
-  @Autowired
+//  @Autowired
+  @Inject
   FlightService flightService;
 
   private static Logger logger = Logger.getLogger(FlightLoader.class.getName());

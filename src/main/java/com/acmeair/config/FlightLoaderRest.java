@@ -16,7 +16,9 @@
 
 package com.acmeair.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +28,8 @@ import com.acmeair.loader.FlightLoader;
 @RequestMapping("/loader")
 public class FlightLoaderRest {
 
-	@Autowired
+//	@Autowired
+    @Inject
 	private FlightLoader loader;
 
 	@RequestMapping("/load")

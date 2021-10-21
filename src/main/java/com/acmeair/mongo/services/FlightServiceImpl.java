@@ -25,9 +25,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.acmeair.AirportCodeMapping;
@@ -52,7 +53,8 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
   private MongoCollection<Document> flightSegment;
   private MongoCollection<Document> airportCodeMapping;
   
-  @Autowired
+//  @Autowired
+  @Inject
   KeyGenerator keyGenerator;
 
   /**
