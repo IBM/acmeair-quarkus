@@ -16,9 +16,9 @@
 package com.acmeair.web;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,10 +29,12 @@ import com.acmeair.client.FlightClient;
 public class RewardTracker {
 
 
-  @Autowired
+//  @Autowired
+  @Inject
   private CustomerClient customerClient;
   
-  @Autowired
+//  @Autowired
+  @Inject
   private FlightClient flightClient; 
  
     

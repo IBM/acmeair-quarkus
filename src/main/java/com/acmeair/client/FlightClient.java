@@ -21,6 +21,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -28,7 +29,7 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.http.HttpEntity;
 //import org.springframework.http.HttpHeaders;
@@ -50,7 +51,8 @@ public class FlightClient {
     @Value("${flight.service:localhost:6379/customer}")
     protected String FLIGHT_SERVICE_LOC;
     
-    @Autowired
+//    @Autowired
+    @Inject
     private SecurityUtils secUtils; 
     
 	/**

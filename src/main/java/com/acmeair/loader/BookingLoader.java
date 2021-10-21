@@ -18,7 +18,9 @@ package com.acmeair.loader;
 
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.acmeair.service.BookingService;
@@ -26,7 +28,8 @@ import com.acmeair.service.BookingService;
 @Component
 public class BookingLoader {
 
-	@Autowired
+//	@Autowired
+	@Inject
 	BookingService bookingService;
 
 	private static Logger logger = Logger.getLogger(BookingLoader.class.getName());
