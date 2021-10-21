@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.acmeair.service.CustomerService;
@@ -30,7 +32,8 @@ import com.acmeair.service.CustomerService;
 @Component
 public class CustomerLoader {
 
-  @Autowired
+//  @Autowired
+  @Inject
   CustomerService customerService;
     
   private static Logger logger = Logger.getLogger(CustomerLoader.class.getName());

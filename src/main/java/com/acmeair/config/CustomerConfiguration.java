@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +36,8 @@ public class CustomerConfiguration {
 
 	Logger logger = Logger.getLogger(CustomerConfiguration.class.getName());
 
-	@Autowired
+//	@Autowired
+	@Inject
 	CustomerService customerService;
 
 	/**

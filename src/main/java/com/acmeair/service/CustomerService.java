@@ -18,7 +18,9 @@ package com.acmeair.service;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
+//import org.springframework.beans.factory.annotation.Autowired;
 
 import com.acmeair.web.dto.CustomerInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,7 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class CustomerService {
 	protected static final int DAYS_TO_ALLOW_SESSION = 1;
 
-	@Autowired
+//	@Autowired
+    @Inject
 	protected KeyGenerator keyGenerator;
 
 	public abstract void createCustomer(String username, String password, String status, int totalMiles, int milesYtd,
