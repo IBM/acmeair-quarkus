@@ -1,134 +1,110 @@
-acmeair-booking-db-sb:
-  container_name: acmeair-booking-db-sb
-  image: mongo
-  net: ${NETWORK}
+#version: "3"
 
-acmeair-customer-db-sb:
-  container_name: acmeair-customer-db-sb
-  image: mongo
-  net: ${NETWORK}
+services:
+  acmeair-booking-db-sb:
+    container_name: acmeair-booking-db-sb
+    image: mongo
+    networks:
+      - net1
 
-acmeair-flight-db-sb:
-  container_name: acmeair-flight-db-sb
-  image: mongo
-  net: ${NETWORK}
+  acmeair-customer-db-sb:
+    container_name: acmeair-customer-db-sb
+    image: mongo
+    networks:
+      - net1
 
-acmeair-nginx:
-  container_name: acmeair-nginx
-  net: ${NETWORK}
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-  volumes:
-    - /www/public
-  volumes_from:
-    - acmeair-mainservice-quarkus
-    - acmeair-authservice-quarkus
-    - acmeair-bookingservice-quarkus
-    - acmeair-customerservice-quarkus
-    - acmeair-flightservice-quarkus
+  acmeair-flight-db-sb:
+    container_name: acmeair-flight-db-sb
+    image: mongo
+    networks:
+      - net1
 
-#acmeair-mainservice-springboot:
-#  container_name: acmeair-mainservice-springboot
-#  net: ${NETWORK}
-#  build: ../acmeair-mainservice-springboot/
-#  environment:
-#    - LICENSE=accept
-#  privileged: true
+  acmeair-nginx:
+    container_name: acmeair-nginx
+    networks:
+      - net1
+    restart: always
+    build:
+      context: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - /www/public
+    volumes_from:
+      - acmeair-mainservice-quarkus
+      - acmeair-authservice-quarkus
+      - acmeair-bookingservice-quarkus
+      - acmeair-customerservice-quarkus
+      - acmeair-flightservice-quarkus
 
-acmeair-mainservice-quarkus:
-  container_name: acmeair-mainservice-quarkus
-  net: ${NETWORK}
-  build: ../acmeair-mainservice-quarkus/
-  environment:
-    - LICENSE=accept
-  privileged: true
+  acmeair-mainservice-quarkus:
+    container_name: acmeair-mainservice-quarkus
+    networks:
+      - net1
+    build:
+      context: ../acmeair-mainservice-quarkus/
+      dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
+    environment:
+      - LICENSE=accept
+    privileged: true
 
-#acmeair-authservice-springboot:
-#  container_name: acmeair-authservice-springboot
-#  net: ${NETWORK}
-#  build: ../acmeair-authservice-springboot/
-#  environment:
-#    - LICENSE=accept
-#    - CUSTOMER_SERVICE=acmeair-nginx/customer
-#  privileged: true
+  acmeair-authservice-quarkus:
+    container_name: acmeair-authservice-quarkus
+    networks:
+      - net1
+    build:
+      context: ../acmeair-authservice-quarkus/
+      dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
+    environment:
+      - LICENSE=accept
+      - CUSTOMER_SERVICE=acmeair-nginx/customer
+    privileged: true
 
-acmeair-authservice-quarkus:
-  container_name: acmeair-authservice-quarkus
-  net: ${NETWORK}
-  build: ../acmeair-authservice-quarkus/
-  environment:
-    - LICENSE=accept
-    - CUSTOMER_SERVICE=acmeair-nginx/customer
-  privileged: true
+  acmeair-bookingservice-quarkus:
+    container_name: acmeair-bookingservice-quarkus
+    networks:
+      - net1
+    build:
+      context: ../acmeair-bookingservice-quarkus/
+      dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
+    environment:
+      - LICENSE=accept
+      - MONGO_HOST=acmeair-booking-db-sb
+      - CUSTOMER_SERVICE=acmeair-nginx/customer
+      - FLIGHT_SERVICE=acmeair-nginx/flight
+    volumes_from:
+      - acmeair-booking-db-sb
+    privileged: true
 
-#acmeair-bookingservice-springboot:
-#  container_name: acmeair-bookingservice-springboot
-#  net: ${NETWORK}
-#  build: ../acmeair-bookingservice-springboot/
-#  environment:
-#    - LICENSE=accept
-#    - MONGO_HOST=acmeair-booking-db-sb
-#    - CUSTOMER_SERVICE=acmeair-nginx/customer
-#    - FLIGHT_SERVICE=acmeair-nginx/flight
-#  volumes_from:
-#    - acmeair-booking-db-sb
-#  privileged: true
+  acmeair-customerservice-quarkus:
+    container_name: acmeair-customerservice-quarkus
+    networks:
+      - net1
+    build:
+      context: ../acmeair-customerservice-quarkus/
+      dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
+    environment:
+      - LICENSE=accept
+      - MONGO_HOST=acmeair-customer-db-sb
+    volumes_from:
+      - acmeair-customer-db-sb
+    privileged: true
 
-acmeair-bookingservice-quarkus:
-  container_name: acmeair-bookingservice-quarkus
-  net: ${NETWORK}
-  build: ../acmeair-bookingservice-quarkus/
-  environment:
-    - LICENSE=accept
-    - MONGO_HOST=acmeair-booking-db-sb
-    - CUSTOMER_SERVICE=acmeair-nginx/customer
-    - FLIGHT_SERVICE=acmeair-nginx/flight
-  volumes_from:
-    - acmeair-booking-db-sb
-  privileged: true
+  acmeair-flightservice-quarkus:
+    container_name: acmeair-flightservice-quarkus
+    networks:
+      - net1
+    build:
+      context: ../acmeair-flightservice-quarkus/
+      dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
+    environment:
+      - LICENSE=accept
+      - MONGO_HOST=acmeair-flight-db-sb
+    volumes_from:
+      - acmeair-flight-db-sb
+    privileged: true
 
-#acmeair-customerservice-springboot:
-#  container_name: acmeair-customerservice-springboot
-#  net: ${NETWORK}
-#  build: ../acmeair-customerservice-springboot/
-#  environment:
-#    - LICENSE=accept
-#    - MONGO_HOST=acmeair-customer-db-sb
-#  volumes_from:
-#    - acmeair-customer-db-sb
-#  privileged: true
-
-acmeair-customerservice-quarkus:
-  container_name: acmeair-customerservice-quarkus
-  net: ${NETWORK}
-  build: ../acmeair-customerservice-quarkus/
-  environment:
-    - LICENSE=accept
-    - MONGO_HOST=acmeair-customer-db-sb
-  volumes_from:
-    - acmeair-customer-db-sb
-  privileged: true
-
-#acmeair-flightservice-springboot:
-#  container_name: acmeair-flightservice-springboot
-#  net: ${NETWORK}
-#  build: ../acmeair-flightservice-springboot/
-#  environment:
-#    - LICENSE=accept
-#    - MONGO_HOST=acmeair-flight-db-sb
-#  volumes_from:
-#    - acmeair-flight-db-sb
-#  privileged: true
-
-acmeair-flightservice-quarkus:
-  container_name: acmeair-flightservice-quarkus
-  net: ${NETWORK}
-  build: ../acmeair-flightservice-quarkus/
-  environment:
-    - LICENSE=accept
-    - MONGO_HOST=acmeair-flight-db-sb
-  volumes_from:
-    - acmeair-flight-db-sb
-  privileged: true
+networks:
+  net1:
+    external: true
+    name: "${NETWORK:?}"
