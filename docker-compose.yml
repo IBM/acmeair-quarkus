@@ -99,7 +99,7 @@ services:
   acmeair-flightservice-quarkus:
     << : *service-defaults
     container_name: acmeair-flightservice-quarkus
-    image: acmeair-customerservice-quarkus:${RUNTIME:-latest}
+    image: acmeair-flightservice-quarkus:${RUNTIME:-latest}
     build:
       context: ../acmeair-flightservice-quarkus/
       dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
