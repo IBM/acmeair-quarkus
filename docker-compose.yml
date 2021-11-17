@@ -31,13 +31,14 @@ services:
 
   acmeair-nginx:
     container_name: acmeair-nginx
+    image: acmeair-nginx
     networks:
       - net1
     restart: always
     build:
       context: ./nginx/
     ports:
-      - "80:80"
+      - "80:8080"
     volumes:
       - /www/public
     volumes_from:
@@ -50,6 +51,10 @@ services:
   acmeair-mainservice-quarkus:
     << : *service-defaults
     container_name: acmeair-mainservice-quarkus
+    networks:
+      net1:
+        aliases:
+          - acmeair-mainservice-quarkus.acmeair
     image: acmeair-mainservice-quarkus:${RUNTIME:-latest}
     build:
       context: ../acmeair-mainservice-quarkus/
@@ -60,17 +65,25 @@ services:
   acmeair-authservice-quarkus:
     << : *service-defaults
     container_name: acmeair-authservice-quarkus
+    networks:
+      net1:
+        aliases:
+          - acmeair-authservice-quarkus.acmeair
     image: acmeair-authservice-quarkus:${RUNTIME:-latest}
     build:
       context: ../acmeair-authservice-quarkus/
       dockerfile: src/main/docker/Dockerfile.${RUNTIME:-jvm}
     environment:
 #     LICENSE: accept
-      CUSTOMER_SERVICE: acmeair-nginx/customer
+      CUSTOMER_SERVICE: acmeair-nginx:8080/customer
 
   acmeair-bookingservice-quarkus:
     << : *service-defaults
     container_name: acmeair-bookingservice-quarkus
+    networks:
+      net1:
+        aliases:
+          - acmeair-bookingservice-quarkus.acmeair
     image: acmeair-bookingservice-quarkus:${RUNTIME:-latest}
     build:
       context: ../acmeair-bookingservice-quarkus/
@@ -78,14 +91,18 @@ services:
     environment:
 #      LICENSE: accept
       MONGO_HOST: acmeair-booking-db-sb
-      CUSTOMER_SERVICE: acmeair-nginx/customer
-      FLIGHT_SERVICE: acmeair-nginx/flight
+      CUSTOMER_SERVICE: acmeair-nginx:8080/customer
+      FLIGHT_SERVICE: acmeair-nginx:8080/flight
     volumes_from:
       - acmeair-booking-db-sb
 
   acmeair-customerservice-quarkus:
     << : *service-defaults
     container_name: acmeair-customerservice-quarkus
+    networks:
+      net1:
+        aliases:
+          - acmeair-customerservice-quarkus.acmeair
     image: acmeair-customerservice-quarkus:${RUNTIME:-latest}
     build:
       context: ../acmeair-customerservice-quarkus/
@@ -99,6 +116,10 @@ services:
   acmeair-flightservice-quarkus:
     << : *service-defaults
     container_name: acmeair-flightservice-quarkus
+    networks:
+      net1:
+        aliases:
+          - acmeair-flightservice-quarkus.acmeair
     image: acmeair-flightservice-quarkus:${RUNTIME:-latest}
     build:
       context: ../acmeair-flightservice-quarkus/
