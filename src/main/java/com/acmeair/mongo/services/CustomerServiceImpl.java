@@ -35,7 +35,6 @@ import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.springframework.stereotype.Component;
 
-import com.acmeair.mongo.ConnectionManager;
 import com.acmeair.mongo.MongoConstants;
 import com.acmeair.service.CustomerService;
 import com.acmeair.web.dto.CustomerInfo;
@@ -71,7 +70,7 @@ public class CustomerServiceImpl extends CustomerService implements MongoConstan
           if (acmeairProps != null) {
               prop.load(new FileInputStream(acmeairProps));
           } else {
-              prop.load(ConnectionManager.class.getResourceAsStream("/config.properties"));
+              prop.load(CustomerServiceImpl.class.getResourceAsStream("/config.properties"));
               acmeairProps = "OK";
           }
       } catch (IOException ex) {
