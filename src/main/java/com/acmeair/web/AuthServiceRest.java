@@ -75,7 +75,8 @@ public class AuthServiceRest {
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public ModelAndView login(@FormParam("login") String login, @FormParam("password") String password) {
+//    public ModelAndView login(@FormParam("login") String login, @FormParam("password") String password) {
+    public Map<String, String> login(@FormParam("login") String login, @FormParam("password") String password) {
 		// Test: curl -d 'login=user1' -d 'password=letmein' http://localhost:8080/login
 		try {
 			
@@ -99,20 +100,21 @@ public class AuthServiceRest {
 			model.put("token", token);
 			model.put("login", login);
 									
-			return new ModelAndView(new View() {
-
-				@Override
-				public String getContentType() {
-					return "text/plain";
-				}
-
-				@Override
-				public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
-						throws Exception {
-					response.getWriter().print("logged in");
-				}
-			}, model);
-
+//			return new ModelAndView(new View() {
+//
+//				@Override
+//				public String getContentType() {
+//					return "text/plain";
+//				}
+//
+//				@Override
+//				public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+//						throws Exception {
+//					response.getWriter().print("logged in");
+//				}
+//			}, model);
+			return model;
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ForbiddenException("Error: " + e.getLocalizedMessage());

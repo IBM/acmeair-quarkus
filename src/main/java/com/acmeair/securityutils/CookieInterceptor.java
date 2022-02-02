@@ -20,6 +20,7 @@ package com.acmeair.securityutils;
 //import javax.servlet.http.HttpFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
@@ -47,8 +48,10 @@ public class CookieInterceptor implements ContainerResponseFilter {
             return;
         }
 
-        ModelAndView modelAndView = (ModelAndView)response.getEntity();
-		ModelMap modelMap = modelAndView.getModelMap();
+//        ModelAndView modelAndView = (ModelAndView)response.getEntity();
+//		ModelMap modelMap = modelAndView.getModelMap();
+        @SuppressWarnings("unchecked")
+        Map<String, String> modelMap = (Map<String, String>)response.getEntity();
 		String token = (String) modelMap.getOrDefault("token", "");
 		String login = (String) modelMap.getOrDefault("login", "");
 
