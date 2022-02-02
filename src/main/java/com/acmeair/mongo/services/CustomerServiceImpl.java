@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -105,8 +104,8 @@ public class CustomerServiceImpl extends CustomerService implements MongoConstan
       customer = database.getCollection("customer");
 
       List<ServerAddress> hostAddrs =  mongoClient.getClusterDescription().getClusterSettings().getHosts();
-      logger.info("#### Mongo DB Server:Port list " + hostAddrs.toString() + " ####");
-      logger.info("#### Mongo DB is created with DB name " + dbname + " ####");
+      logger.info("#### Mongo DB [Server:Port] list: " + hostAddrs.toString() + " ####");
+      logger.info("#### Mongo DB is created with DB name: " + dbname + " ####");
       logger.info("#### MongoClient Options ####");
       logger.info("maxWaitTime : " + conn.getMaxWaitTime());
       logger.info("connectTimeout : " + conn.getConnectTimeout());
