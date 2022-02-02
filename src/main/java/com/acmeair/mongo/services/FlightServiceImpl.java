@@ -18,9 +18,12 @@ package com.acmeair.mongo.services;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,17 +31,20 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.bson.Document;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.acmeair.AirportCodeMapping;
-import com.acmeair.mongo.ConnectionManager;
 import com.acmeair.mongo.MongoConstants;
 import com.acmeair.service.FlightService;
 import com.acmeair.service.KeyGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
+import com.mongodb.ConnectionString;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -46,6 +52,12 @@ import com.mongodb.client.MongoDatabase;
 
 @Component
 public class FlightServiceImpl extends FlightService implements  MongoConstants {
+
+  @Inject
+  MongoClient mongoClient;
+
+  @ConfigProperty(name = "quarkus.mongodb.connection-string")
+  String connectionString;
 
   private static final Logger logger = Logger.getLogger(FlightServiceImpl.class.getName()); 
   
@@ -62,10 +74,61 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
    */
   @PostConstruct
   public void initialization() {
-    MongoDatabase database = ConnectionManager.getConnectionManager().getDb();
+//    MongoDatabase database = ConnectionManager.getConnectionManager().getDb();
+    ConnectionString conn = new ConnectionString(connectionString);
+    String dbname = conn.getDatabase();
+
+    Properties prop = new Properties();
+    String acmeairProps = System.getenv("ACMEAIR_PROPERTIES");
+    try {
+        if (acmeairProps != null) {
+            prop.load(new FileInputStream(acmeairProps));
+        } else {
+            prop.load(FlightServiceImpl.class.getResourceAsStream("/config.properties"));
+            acmeairProps = "OK";
+        }
+    } catch (IOException ex) {
+        logger.info("Properties file does not exist" + ex.getMessage());
+        acmeairProps = null;
+    }
+    if (acmeairProps != null) {
+        logger.info("Reading mongo.properties file");
+        if(dbname == null) {
+            if (System.getenv("MONGO_DBNAME") != null) {
+                dbname = System.getenv("MONGO_DBNAME");
+            } else if (prop.containsKey("dbname")) {
+                dbname = prop.getProperty("dbname");
+            }
+            if(dbname == null) {
+                dbname = "acmeair";
+            }
+        }
+        if (prop.containsKey("hostname") || prop.containsKey("port") ||
+                prop.containsKey("username") || prop.containsKey("password") ||
+                prop.containsKey("sslEnabled") ||
+                prop.containsKey("connectionsPerHost") || prop.containsKey("minConnectionsPerHost") ||
+                prop.containsKey("maxWaitTime") || prop.containsKey("connectTimeout") || prop.containsKey("socketTimeout") ||
+                prop.containsKey("socketKeepAlive") ||
+                prop.containsKey("threadsAllowedToBlockForConnectionMultiplier")) {
+            logger.warning("Options specified in config.properties (except \"dbname\") are ignored. " +
+                    "Use application.properties or environment varialbes to specify MongoDB connection options.");
+        }
+    }
+
+    MongoDatabase database = mongoClient.getDatabase(dbname);
     flight = database.getCollection("flight");
     flightSegment = database.getCollection("flightSegment");
     airportCodeMapping = database.getCollection("airportCodeMapping");
+
+    List<ServerAddress> hostAddrs =  mongoClient.getClusterDescription().getClusterSettings().getHosts();
+    logger.info("#### Mongo DB [Server:Port] list: " + hostAddrs.toString() + " ####");
+    logger.info("#### Mongo DB is created with DB name: " + dbname + " ####");
+    logger.info("#### MongoClient Options ####");
+    logger.info("maxWaitTime : " + conn.getMaxWaitTime());
+    logger.info("connectTimeout : " + conn.getConnectTimeout());
+    logger.info("socketTimeout : " + conn.getSocketTimeout());
+    logger.info("sslEnabled : " + conn.getSslEnabled());
+    logger.info("Complete List : " + connectionString);
   }
 
   @Override
