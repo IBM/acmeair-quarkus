@@ -21,48 +21,35 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.client.jaxrs.engines.URLConnectionEngine;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.http.HttpEntity;
-//import org.springframework.http.HttpHeaders;
-//import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-//import org.springframework.util.LinkedMultiValueMap;
-//import org.springframework.util.MultiValueMap;
-//import org.springframework.web.client.RestTemplate;
 
-import com.acmeair.client.CustomerClient;
 import com.acmeair.securityutils.SecurityUtils;
 
-@Component
+@ApplicationScoped
 public class CustomerClient {
 
 	/**
 	 * Accepts environment variable override CUSTOMER_SERVICE
 	 */
-	@Value("${customer.service:localhost:6379/customer}")
+    @ConfigProperty(name = "customer.service", defaultValue = "localhost:6379/customer")
 	String CUSTOMER_SERVICE_LOC;
 
 	private static final String VALIDATE_PATH = "/validateid";
 
-//	@Autowired
 	@Inject
 	private SecurityUtils secUtils;
 
 	// cache this for perf reasons
-//	private static RestTemplate restTemplate = new RestTemplate();
-//    private static Client client = ClientBuilder.newClient();
-//  private static Client client = new ResteasyClientBuilderImpl().build();
     private static Client client = new ResteasyClientBuilderImpl()
 //                                      .httpEngine(new VertxClientHttpEngine)
                                       .httpEngine(new URLConnectionEngine())
@@ -86,10 +73,7 @@ public class CustomerClient {
 		String url = "http://" + CUSTOMER_SERVICE_LOC + VALIDATE_PATH;
 		String urlParameters = "login=" + login + "&password=" + password;
 	
-//		HttpHeaders headers = new HttpHeaders();
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<String, Object>();
-
-//		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
 		if (secUtils.secureServiceCalls()) {
 
@@ -107,25 +91,18 @@ public class CustomerClient {
 				throw new RuntimeException(e);
 			}
 
-//			headers.set("acmeair-id", login);
-//			headers.set("acmeair-date", date.toString());
-//			headers.set("acmeair-sig-body", sigBody);
-//			headers.set("acmeair-signature", signature);
             headers.putSingle("acmeair-id", login);
             headers.putSingle("acmeair-date", date.toString());
             headers.putSingle("acmeair-sig-body", sigBody);
             headers.putSingle("acmeair-signature", signature);
 		}
 
-//		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
         MultivaluedMap<String, String> map = new MultivaluedHashMap<String, String>();
 		map.add("login", login);
 		map.add("password", password);
 
-//		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
         Entity<Form> request = Entity.form(map);
 
-//		CustomerResult result = restTemplate.postForObject(url, request, CustomerResult.class);
 		CustomerResult result = client.target(url).request()
                                                   .headers(headers)
                                                   .post(request, CustomerResult.class);

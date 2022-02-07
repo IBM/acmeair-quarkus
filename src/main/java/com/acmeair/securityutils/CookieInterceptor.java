@@ -15,16 +15,8 @@
 *******************************************************************************/
 package com.acmeair.securityutils;
 
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.http.HttpFilter;
-
 import java.io.IOException;
 import java.util.Map;
-
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
-//import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -35,34 +27,28 @@ import javax.ws.rs.ext.Provider;
 
 import com.acmeair.web.AuthServiceRest;
 
-//public class CookieInterceptor extends HandlerInterceptorAdapter {
 @Provider
 public class CookieInterceptor implements ContainerResponseFilter {
 	@Override
-//    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-//            ModelAndView modelAndView) throws Exception {
 	public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
-//		super.postHandle(request, response, handler, modelAndView);
 
-        if(!request.getUriInfo().getPath().equals("/login")) {
-            return;
-        }
+      if(!request.getUriInfo().getPath().equals("/login")) {
+          return;
+      }
+      if(response.getStatus() != 200) {
+          return;
+      }
 
-//        ModelAndView modelAndView = (ModelAndView)response.getEntity();
-//		ModelMap modelMap = modelAndView.getModelMap();
-        @SuppressWarnings("unchecked")
-        Map<String, String> modelMap = (Map<String, String>)response.getEntity();
-		String token = (String) modelMap.getOrDefault("token", "");
-		String login = (String) modelMap.getOrDefault("login", "");
-
-//      response.addHeader("Set-Cookie", AuthServiceRest.JWT_COOKIE_NAME + "=" + token + "; Path=/");
-//      response.addHeader("Set-Cookie", AuthServiceRest.USER_COOKIE_NAME + "=" + login + "; Path=/");
+      @SuppressWarnings("unchecked")
+      Map<String, String> modelMap = (Map<String, String>)response.getEntity();
+      String token = (String) modelMap.getOrDefault("token", "");
+      String login = (String) modelMap.getOrDefault("login", "");
+      
       MultivaluedMap<String, Object> resHeaders = response.getHeaders();
       resHeaders.add("Set-Cookie", AuthServiceRest.JWT_COOKIE_NAME + "=" + token + "; Path=/");
       resHeaders.add("Set-Cookie", AuthServiceRest.USER_COOKIE_NAME + "=" + login + "; Path=/");
 
-      // Rewrite response entity here as the View.render() of the ModelAndView instance returned from AuthServiceRest
-      // would do because Quarkus'es dispatcher does not invoke render()
+      // Rewrite response entity here
       response.setEntity("logged in", null, MediaType.TEXT_PLAIN_TYPE);
 	}
 }
