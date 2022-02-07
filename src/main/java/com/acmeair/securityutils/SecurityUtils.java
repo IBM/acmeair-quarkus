@@ -29,10 +29,11 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.enterprise.context.ApplicationScoped;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
+//import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.stereotype.Component;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 //import com.auth0.jwt.JWT;
 //import com.auth0.jwt.JWTVerifier;
 //import com.auth0.jwt.algorithms.Algorithm;
@@ -43,16 +44,19 @@ import io.smallrye.jwt.auth.principal.DefaultJWTParser;
 import io.smallrye.jwt.auth.principal.JWTAuthContextInfo;
 import io.smallrye.jwt.build.Jwt;
 
-@Component
+//@Component
+@ApplicationScoped
 public class SecurityUtils {
 
-  @Value("${secure.service.calls:true}")
+//  @Value("${secure.service.calls:true}")
+  @ConfigProperty(name = "secure.service.calls", defaultValue = "true")
   boolean SECURE_SERVICE_CALLS;
 
   /**
    * Accepts environment variable override SECURE_USER_CALLS
    */
-  @Value("${secure.user.calls:true}")
+//  @Value("${secure.user.calls:true}")
+  @ConfigProperty(name = "secure.user.calls", defaultValue = "true")
   boolean SECURE_USER_CALLS;
 
   private static final Logger logger = Logger.getLogger(SecurityUtils.class.getName());

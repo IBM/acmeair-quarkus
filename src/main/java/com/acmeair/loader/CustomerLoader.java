@@ -22,17 +22,14 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.acmeair.service.CustomerService;
 
-@Component
+@ApplicationScoped
 public class CustomerLoader {
 
-//  @Autowired
   @Inject
   CustomerService customerService;
     

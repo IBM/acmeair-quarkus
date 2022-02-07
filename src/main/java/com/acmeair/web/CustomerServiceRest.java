@@ -31,17 +31,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.acmeair.securityutils.ForbiddenException;
 import com.acmeair.securityutils.SecurityUtils;
 import com.acmeair.service.CustomerService;
@@ -50,16 +39,12 @@ import com.acmeair.web.dto.CustomerInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-//@RestController
-//@RequestMapping("/")
 @Path("/")
 public class CustomerServiceRest {
 
-//  @Autowired
   @Inject
   CustomerService customerService;
 
-//  @Autowired
   @Inject
   private SecurityUtils secUtils;
 
@@ -68,9 +53,6 @@ public class CustomerServiceRest {
   /**
    * Get customer info.
    */
-//  @RequestMapping(value = "/byid/{custid}")
-//  PUBLIC STRING GETCUSTOMER(@PATHVARIABLE("CUSTID") STRING CUSTOMERID,
-//      @COOKIEVALUE(VALUE = "JWT_TOKEN", REQUIRED = FALSE) STRING JWTTOKEN) {
   @GET
   @Path("/byid/{custid}")
   public String getCustomer(@PathParam("custid") String customerid,
@@ -97,9 +79,6 @@ public class CustomerServiceRest {
   /**
    * Update customer.
    */
-//  @RequestMapping(value = "/byid/{custid}", method = RequestMethod.POST)
-//  public String putCustomer(@RequestBody CustomerInfo customer,
-//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
   @POST
   @Path("/byid/{custid}")
   public String putCustomer(CustomerInfo customer,
@@ -133,10 +112,6 @@ public class CustomerServiceRest {
   /**
    * Validate user/password.
    */
-//  @RequestMapping(value = "/validateid", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-//  public ValidateCustomerResponse validateCustomer(@RequestHeader(name = "acmeair-id", required = false) String headerId,
-//          @RequestHeader(name = "acmeair-date", required = false) String headerDate, @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody,
-//          @RequestHeader(name = "acmeair-signature", required = false) String headerSig, @RequestParam String login, @RequestParam String password) {
   @POST
   @Path("/validateid")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -168,11 +143,6 @@ public class CustomerServiceRest {
   /**
    * Update reward miles.
    */
-//  @RequestMapping(value = "/updateCustomerTotalMiles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-//  public UpdateMilesResult updateCustomerTotalMiles(@RequestHeader(name = "acmeair-id", required = false) String headerId,
-//      @RequestHeader(name = "acmeair-date", required = false) String headerDate, @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody,
-//      @RequestHeader(name = "acmeair-signature", required = false) String headerSig,
-//      @RequestParam String customerid,  @RequestParam Long miles) {
   @POST
   @Path(value = "/updateCustomerTotalMiles")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -225,7 +195,6 @@ public class CustomerServiceRest {
     }
   }
 
-//  @RequestMapping("/")
   @Path("/")
   public String checkStatus() {
     return "OK";

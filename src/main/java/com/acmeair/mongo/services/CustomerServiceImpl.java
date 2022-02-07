@@ -32,8 +32,6 @@ import javax.inject.Inject;
 
 import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.springframework.stereotype.Component;
-
 import com.acmeair.mongo.MongoConstants;
 import com.acmeair.service.CustomerService;
 import com.acmeair.web.dto.CustomerInfo;
@@ -43,7 +41,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-//@Component
 @ApplicationScoped
 public class CustomerServiceImpl extends CustomerService implements MongoConstants {
 
@@ -59,7 +56,6 @@ public class CustomerServiceImpl extends CustomerService implements MongoConstan
 
   @PostConstruct
   public void initialization() {
-//    MongoDatabase database = ConnectionManager.getConnectionManager().getDb();
       ConnectionString conn = new ConnectionString(connectionString);
       String dbname = conn.getDatabase();
 
@@ -116,7 +112,6 @@ public class CustomerServiceImpl extends CustomerService implements MongoConstan
 
   @Override
   public Long count() {
-//    return customer.count();
     return customer.countDocuments();
   }
 

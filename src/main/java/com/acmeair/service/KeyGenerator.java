@@ -16,9 +16,9 @@
 
 package com.acmeair.service;
 
-import org.springframework.stereotype.Component;
+import javax.enterprise.context.ApplicationScoped;
 
-@Component
+@ApplicationScoped
 public class KeyGenerator {
 
   public Object generate() {

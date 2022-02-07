@@ -17,30 +17,33 @@
 package com.acmeair.config;
 
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import com.acmeair.loader.CustomerLoader;
 
-@RestController
-@RequestMapping("/loader")
+@Path("/loader")
 public class CustomerLoaderRest {
 
-//	@Autowired
     @Inject
 	private CustomerLoader loader;
 
-	@RequestMapping("/query")
+    @GET
+	@Path("/query")
+    @Produces(MediaType.TEXT_PLAIN)
 	public String queryLoader() {
 		String response = loader.queryLoader();
 		return response;
 	}
 
-	@RequestMapping("/load")
-	public String loadDb(@RequestParam(name = "numCustomers", defaultValue = "-1") long numCustomers) {
+    @GET
+    @Path("/load")
+    @Produces(MediaType.TEXT_PLAIN)
+	public String loadDb(@DefaultValue("-1") @QueryParam("numCustomers") long numCustomers) {
 		String response = loader.loadCustomerDb(numCustomers);
 		return response;
 	}
