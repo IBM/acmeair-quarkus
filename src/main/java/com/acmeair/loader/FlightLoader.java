@@ -25,20 +25,17 @@ import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.acmeair.AirportCodeMapping;
 import com.acmeair.service.FlightService;
 
-@Component
+@ApplicationScoped
 public class FlightLoader {
 
   private static final int MAX_FLIGHTS_PER_SEGMENT = 5;
 
-//  @Autowired
   @Inject
   FlightService flightService;
 

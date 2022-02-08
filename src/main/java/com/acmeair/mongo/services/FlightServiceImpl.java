@@ -28,12 +28,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.acmeair.AirportCodeMapping;
 import com.acmeair.mongo.MongoConstants;
@@ -48,9 +47,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-//import com.mongodb.util.JSON;
 
-@Component
+@ApplicationScoped
 public class FlightServiceImpl extends FlightService implements  MongoConstants {
 
   @Inject
@@ -65,7 +63,6 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
   private MongoCollection<Document> flightSegment;
   private MongoCollection<Document> airportCodeMapping;
   
-//  @Autowired
   @Inject
   KeyGenerator keyGenerator;
 
@@ -74,7 +71,6 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
    */
   @PostConstruct
   public void initialization() {
-//    MongoDatabase database = ConnectionManager.getConnectionManager().getDb();
     ConnectionString conn = new ConnectionString(connectionString);
     String dbname = conn.getDatabase();
 
@@ -133,19 +129,16 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
 
   @Override
   public Long countFlights() {
-//    return flight.count();
     return flight.countDocuments();
   }
   
   @Override
   public Long countFlightSegments() {
-//    return flightSegment.count();
     return flightSegment.countDocuments();
   }
   
   @Override
   public Long countAirports() {
-//    return airportCodeMapping.count();
     return airportCodeMapping.countDocuments();
   }
   
@@ -222,7 +215,6 @@ public class FlightServiceImpl extends FlightService implements  MongoConstants 
           tempDoc.append("scheduledDepartureTime", deptTime.toString());
           tempDoc.remove("scheduledArrivalTime");
           tempDoc.append("scheduledArrivalTime", arvTime.toString());
-//          tempDoc.append("flightSegment", JSON.parse(segment));
           tempDoc.append("flightSegment", BasicDBObject.parse(segment));
           
           if (logger.isLoggable(Level.FINE)) {

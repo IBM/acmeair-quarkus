@@ -23,20 +23,18 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import com.acmeair.service.FlightService;
 
-@RestController
-@RequestMapping("/config")
+@Path("/config")
 public class FlightConfiguration {
 
 	Logger logger = Logger.getLogger(FlightConfiguration.class.getName());
 
-//	@Autowired
 	@Inject
 	FlightService flightService;
 
@@ -46,7 +44,9 @@ public class FlightConfiguration {
 	/**
 	 * Get the number of flights in the db.
 	 */
-	@RequestMapping(path = "/countFlights", produces = "application/json")
+	@GET
+	@Path("/countFlights")
+	@Produces(MediaType.APPLICATION_JSON)
 	public String countFlights() {
 		try {
 			String count = flightService.countFlights().toString();
@@ -60,7 +60,9 @@ public class FlightConfiguration {
 	/**
 	 * Get the number of flight segments in the db.
 	 */
-	@RequestMapping(path = "/countFlightSegments", produces = "application/json")
+	@GET
+	@Path("/countFlightSegments")
+	@Produces(MediaType.APPLICATION_JSON)
 	public String countFlightSegments() {
 		try {
 			String count = flightService.countFlightSegments().toString();
@@ -74,7 +76,9 @@ public class FlightConfiguration {
 	/**
 	 * Get the number of airports in the db.
 	 */
-	@RequestMapping(path = "/countAirports", produces = "application/json")
+    @GET
+    @Path("/countAirports")
+    @Produces(MediaType.APPLICATION_JSON)
 	public String countAirports() {
 
 		String count = flightService.countAirports().toString();
@@ -89,7 +93,9 @@ public class FlightConfiguration {
 	/**
 	 * Get the database type.
 	 */
-	@RequestMapping(path = "/activeDataService", produces = "application/json")
+    @GET
+    @Path("/activeDataService")
+    @Produces(MediaType.APPLICATION_JSON)
 	public String getActiveDataServiceInfo() {
 		try {
 			logger.fine("Get active Data Service info");
@@ -103,7 +109,9 @@ public class FlightConfiguration {
 	/**
 	 * Get the runtime info.
 	 */
-	@RequestMapping(path = "/runtime", produces = "application/json")
+    @GET
+    @Path("/runtime")
+    @Produces(MediaType.APPLICATION_JSON)
 	public List<Map<String, String>> getRuntimeInfo() {
 		List<Map<String, String>> list = new ArrayList<>();
 		Map<String, String> map = new HashMap<String, String>();
