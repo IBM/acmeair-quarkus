@@ -16,10 +16,8 @@
 
 package com.acmeair.web;
 
-//import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-//import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -30,28 +28,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.MediaType;
-//import org.springframework.web.bind.annotation.RequestHeader;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestMethod;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
-
 import com.acmeair.securityutils.SecurityUtils;
 import com.acmeair.service.FlightService;
 
-//@RestController
-//@RequestMapping("/")
 @Path("/")
 public class FlightServiceRest {
 
 
-//  @Autowired
   @Inject
   private FlightService flightService;
 
-//  @Autowired
   @Inject
   private SecurityUtils secUtils;
 
@@ -59,9 +45,6 @@ public class FlightServiceRest {
    * Get flights.
    */
   
-//  @RequestMapping(value = "/queryflights", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//  public String getTripFlights(@RequestParam String fromAirport, @RequestParam String toAirport, 
-//      @RequestParam Date fromDate, @RequestParam Date returnDate, @RequestParam Boolean oneWay) throws ParseException {
   @POST
   @Path("/queryflights")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -103,13 +86,6 @@ public class FlightServiceRest {
   /**
    * Get reward miles for flight segment.
    */
-//  @RequestMapping(value = "/getrewardmiles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-//  public RewardMilesResponse getRewardMiles(
-//      @RequestHeader(name = "acmeair-id", required = false) String headerId,
-//      @RequestHeader(name = "acmeair-date", required = false) String headerDate,
-//      @RequestHeader(name = "acmeair-sig-body", required = false) String headerSigBody, 
-//      @RequestHeader(name = "acmeair-signature", required = false) String headerSig,
-//      @RequestParam String flightSegment
   @POST
   @Path("/getrewardmiles")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -136,7 +112,6 @@ public class FlightServiceRest {
     return result;
   }
 
-//  @RequestMapping("/")
   @Path("/")
   public String checkStatus() {
     return "OK";        

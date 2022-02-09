@@ -70,13 +70,13 @@ public abstract class FlightService {
 
   // TODO:need to find a way to invalidate these maps
   protected static ConcurrentHashMap<String, String> originAndDestPortToSegmentCache = 
-          new ConcurrentHashMap<String,String>();
+          new ConcurrentHashMap<>();
   protected static ConcurrentHashMap<String, List<String>> flightSegmentAndDataToFlightCache = 
-          new ConcurrentHashMap<String,List<String>>();
+          new ConcurrentHashMap<>();
   protected static ConcurrentHashMap<String, String> flightPKtoFlightCache = 
-          new ConcurrentHashMap<String, String>();
+          new ConcurrentHashMap<>();
   protected static ConcurrentHashMap<String, Long> flightSegmentIdtoRewardsCache = 
-          new ConcurrentHashMap<String, Long>();
+          new ConcurrentHashMap<>();
   
   
   /**
@@ -135,7 +135,7 @@ public abstract class FlightService {
     // cache flights that not available (checks against sentinel value above indirectly)
     try {
       if (segment == "") {
-        return new ArrayList<String>();
+        return new ArrayList<>();
       }
       
       ObjectMapper mapper = new ObjectMapper();
@@ -151,7 +151,7 @@ public abstract class FlightService {
           logger.fine("Segment is null");
         }
         
-        return new ArrayList<String>(); 
+        return new ArrayList<>(); 
       }
 
       String flightSegmentIdAndScheduledDepartureTimeQueryString = segId + deptDate.toString();
@@ -199,7 +199,7 @@ public abstract class FlightService {
   public List<String> getFlightByAirports(String fromAirport, String toAirport) {
     String segment = getFlightSegment(fromAirport, toAirport);
     if (segment == null) {
-      return new ArrayList<String>(); 
+      return new ArrayList<>(); 
     }
     return getFlightBySegment(segment, null);
   }
