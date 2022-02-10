@@ -23,27 +23,27 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import com.acmeair.service.BookingService;
 
-@RestController
-@RequestMapping("/config")
+@Path("/config")
 public class BookingConfiguration {
 
 	Logger logger = Logger.getLogger(BookingConfiguration.class.getName());
 
-//	@Autowired
 	@Inject
 	BookingService bookingService;
 
 	/**
 	 * Get numbers of bookings in the db.
 	 */
-	@RequestMapping(path = "/countBookings", produces = "application/json")
+    @GET
+    @Path("/countBookings")
+    @Produces(MediaType.APPLICATION_JSON)
 	public String countBookings() {
 		try {
 			String count = bookingService.count().toString();
@@ -57,7 +57,9 @@ public class BookingConfiguration {
 	/**
 	 * Get active db impl.
 	 */
-	@RequestMapping(path = "/activeDataService", produces = "application/json")
+    @GET
+    @Path("/activeDataService")
+    @Produces(MediaType.APPLICATION_JSON)
 	public String getActiveDataServiceInfo() {
 		try {
 			logger.fine("Get active Data Service info");
@@ -71,10 +73,12 @@ public class BookingConfiguration {
 	/**
 	 * Get runtime info.
 	 */
-	@RequestMapping(path = "/runtime", produces = "application/json")
+    @GET
+    @Path("/runtime")
+    @Produces(MediaType.APPLICATION_JSON)
 	public List<Map<String, String>> getRuntimeInfo() {
 		List<Map<String, String>> list = new ArrayList<>();
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		map.put("name", "Runtime");
 		map.put("description", "Java");
 		list.add(map);

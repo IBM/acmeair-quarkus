@@ -17,22 +17,22 @@
 package com.acmeair.config;
 
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import com.acmeair.loader.BookingLoader;
 
-@RestController
-@RequestMapping("/loader")
+@Path("/loader")
 public class BookingLoaderRest {
 
-//	@Autowired
 	@Inject
 	private BookingLoader loader;
 
-	@RequestMapping("/load")
+    @GET
+    @Path("/load")
+    @Produces(MediaType.TEXT_PLAIN)
 	public String loadDb() {
 		String response = loader.clearBookingDb();
 		return response;

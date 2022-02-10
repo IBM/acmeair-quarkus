@@ -18,17 +18,14 @@ package com.acmeair.loader;
 
 import java.util.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.acmeair.service.BookingService;
 
-@Component
+@ApplicationScoped
 public class BookingLoader {
 
-//	@Autowired
 	@Inject
 	BookingService bookingService;
 

@@ -27,16 +27,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.MediaType;
-//import org.springframework.web.bind.annotation.CookieValue;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestMethod;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.core.Response;
 
 import com.acmeair.securityutils.ForbiddenException;
 import com.acmeair.securityutils.SecurityUtils;
@@ -44,20 +37,15 @@ import com.acmeair.service.BookingService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-//@RestController
-//@RequestMapping("/")
 @Path("/")
 public class BookingServiceRest {
 
-//  @Autowired
   @Inject
   BookingService bs;
 
-//  @Autowired
   @Inject
   private SecurityUtils secUtils;
 
-//  @Autowired
   @Inject
   private RewardTracker rewardTracker;
 
@@ -67,18 +55,11 @@ public class BookingServiceRest {
   /**
    * Book flights.
    */
-//  @RequestMapping(value = "/bookflights", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//  public String bookFlights(@RequestParam String userid,
-//      @RequestParam String toFlightId,
-//      @RequestParam String toFlightSegId,
-//      @RequestParam String retFlightId,
-//      @RequestParam String retFlightSegId,
-//      @RequestParam boolean oneWayFlight,
-//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
   @POST
   @Path("/bookflights")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-  public String bookFlights(@FormParam("userid") String userid,
+  @Produces(MediaType.TEXT_PLAIN)
+  public Response bookFlights(@FormParam("userid") String userid,
       @FormParam("toFlightId") String toFlightId,
       @FormParam("toFlightSegId") String toFlightSegId,
       @FormParam("retFlightId") String retFlightId,
@@ -110,19 +91,18 @@ public class BookingServiceRest {
       } else {
         bookingInfo = "{\"oneWay\":true,\"departBookingId\":\"" + bookingIdTo + "\"}";
       }
-      return bookingInfo;
+      return Response.ok(bookingInfo).build();
     } catch (Exception e) {
       e.printStackTrace();
-      throw new InternalServerErrorException();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("Error: " + e.getLocalizedMessage())
+                     .build();
     }
   }
 
   /**
    * Get Booking by Number.
    */
-//  @RequestMapping("/bybookingnumber/{userid}/{number}")
-//  public String getBookingByNumber(@PathVariable("number") String number, @PathVariable("userid") String userid,
-//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
   @GET
   @Path("/bybookingnumber/{userid}/{number}")
   public String getBookingByNumber(@PathParam("number") String number, @PathParam("userid") String userid,
@@ -142,9 +122,6 @@ public class BookingServiceRest {
   /**
    * Get bookins for a customer.
    */
-//  @RequestMapping("/byuser/{user}")
-//  public String getBookingsByUser(@PathVariable("user") String user,
-//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
   @GET
   @Path("/byuser/{user}")
   public String getBookingsByUser(@PathParam("user") String user,
@@ -168,13 +145,11 @@ public class BookingServiceRest {
   /**
    * Cancel bookings.
    */
-//  @RequestMapping(value = "/cancelbooking", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//  public String cancelBookingsByNumber(@RequestParam String number, @RequestParam String userid,
-//      @CookieValue(value = "jwt_token", required = false) String jwtToken) {
   @POST
   @Path("/cancelbooking")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-  public String cancelBookingsByNumber(@FormParam("number") String number, @FormParam("userid") String userid,
+  @Produces(MediaType.TEXT_PLAIN)
+  public Response cancelBookingsByNumber(@FormParam("number") String number, @FormParam("userid") String userid,
       @CookieParam("jwt_token") String jwtToken) {
     try {
      
@@ -200,15 +175,16 @@ public class BookingServiceRest {
         bs.cancelBooking(userid, number);
       }
 
-      return "booking " + number + " deleted.";
+      return Response.ok("booking " + number + " deleted.").build();
 
     } catch (Exception e) {
       e.printStackTrace();
-      throw new InternalServerErrorException();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("Error: " + e.getLocalizedMessage())
+                     .build();
     }
   }
 
-//  @RequestMapping("/")
   @Path("/")
   public String checkStatus() {
     return "OK";

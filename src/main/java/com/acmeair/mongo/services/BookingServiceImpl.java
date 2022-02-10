@@ -28,12 +28,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.acmeair.mongo.MongoConstants;
 import com.acmeair.service.BookingService;
@@ -45,7 +44,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 
-@Component
+@ApplicationScoped
 public class BookingServiceImpl implements BookingService, MongoConstants {
 
   @Inject
@@ -58,13 +57,11 @@ public class BookingServiceImpl implements BookingService, MongoConstants {
 
   private MongoCollection<Document> booking;
 
-//  @Autowired
   @Inject
   KeyGenerator keyGenerator;
 
   @PostConstruct
   public void initialization() {
-//    MongoDatabase database = ConnectionManager.getConnectionManager().getDb();
     ConnectionString conn = new ConnectionString(connectionString);
     String dbname = conn.getDatabase();
 
@@ -175,7 +172,7 @@ public class BookingServiceImpl implements BookingService, MongoConstants {
 
   @Override
   public List<String> getBookingsByUser(String user) {
-    List<String> bookings = new ArrayList<String>();
+    List<String> bookings = new ArrayList<>();
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("getBookingsByUser : " + user);
     }
@@ -212,7 +209,6 @@ public class BookingServiceImpl implements BookingService, MongoConstants {
 
   @Override
   public Long count() {
-//      return booking.count();
       return booking.countDocuments();
   }
 
