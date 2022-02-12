@@ -30,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.acmeair.securityutils.ForbiddenException;
 import com.acmeair.securityutils.SecurityUtils;
@@ -81,33 +82,47 @@ public class CustomerServiceRest {
    */
   @POST
   @Path("/byid/{custid}")
-  public String putCustomer(CustomerInfo customer,
+  @Produces(MediaType.TEXT_PLAIN)
+  public Response putCustomer(CustomerInfo customer,
       @CookieParam("jwt_token") String jwtToken) {
 
-    String username = customer.get_id();
+    try {
+        String username = customer.get_id();
 
-    if (secUtils.secureUserCalls() && !secUtils.validateJwt(username, jwtToken)) {
-      throw new ForbiddenException();
+        if (secUtils.secureUserCalls() && !secUtils.validateJwt(username, jwtToken)) {
+            throw new ForbiddenException();
+        }
+
+        String customerFromDb = customerService.getCustomerByUsernameAndPassword(username, customer.getPassword());
+
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("putCustomer : " + customerFromDb);
+        }
+
+        if (customerFromDb == null) {
+            // either the customer doesn't exist or the password is wrong
+            throw new ForbiddenException();
+        }
+
+        customerService.updateCustomer(username, customer);
+
+        // Retrieve the latest results
+        customerFromDb = customerService.getCustomerByUsernameAndPassword(username, customer.getPassword());
+
+        return Response.ok(customerFromDb).build();
+
+    } catch (ForbiddenException e) {
+        e.printStackTrace();
+        return Response.status(Response.Status.FORBIDDEN)
+                       .entity("Error: " + e.getLocalizedMessage())
+                       .build();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity("Error: " + e.getLocalizedMessage())
+                       .build();
     }
-
-    String customerFromDb = customerService.getCustomerByUsernameAndPassword(username, customer.getPassword());
-
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("putCustomer : " + customerFromDb);
-    }
-
-    if (customerFromDb == null) {
-      // either the customer doesn't exist or the password is wrong
-      throw new ForbiddenException();
-    }
-
-    customerService.updateCustomer(username, customer);
-
-    // Retrieve the latest results
-    customerFromDb = customerService.getCustomerByUsernameAndPassword(username, customer.getPassword());
-
-    return customerFromDb;
-  }
+}
 
   /**
    * Validate user/password.
@@ -116,28 +131,40 @@ public class CustomerServiceRest {
   @Path("/validateid")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.APPLICATION_JSON)
-  public ValidateCustomerResponse validateCustomer(@HeaderParam("acmeair-id") String headerId,
+  public Response validateCustomer(@HeaderParam("acmeair-id") String headerId,
       @HeaderParam("acmeair-date") String headerDate, @HeaderParam("acmeair-sig-body") String headerSigBody,
       @HeaderParam("acmeair-signature") String headerSig, @FormParam("login") String login, @FormParam("password") String password) {
 
+    try {
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("validateid : login " + login + " password " + password);
+        }
 
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("validateid : login " + login + " password " + password);
+        // verify header
+        if (secUtils.secureServiceCalls()) {
+            String body = "login=" + login + "&password=" + password;
+            secUtils.verifyBodyHash(body, headerSigBody);
+            secUtils.verifyFullSignature("POST", "/validateid", headerId, headerDate, headerSigBody, headerSig);
+        }
+
+        Boolean validCustomer = customerService.validateCustomer(login, password);
+
+        ValidateCustomerResponse result = new ValidateCustomerResponse();
+        result.validCustomer = validCustomer;
+
+        return Response.ok(result).build();
+
+    } catch (ForbiddenException e) {
+        e.printStackTrace();
+        return Response.status(Response.Status.FORBIDDEN)
+                       .entity("Error: " + e.getLocalizedMessage())
+                       .build();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity("Error: " + e.getLocalizedMessage())
+                       .build();
     }
-
-    // verify header
-    if (secUtils.secureServiceCalls()) {
-      String body = "login=" + login + "&password=" + password;
-      secUtils.verifyBodyHash(body, headerSigBody);
-      secUtils.verifyFullSignature("POST", "/validateid", headerId, headerDate, headerSigBody, headerSig);
-    }
-
-    Boolean validCustomer = customerService.validateCustomer(login, password);
-
-    ValidateCustomerResponse result = new ValidateCustomerResponse();
-    result.validCustomer = validCustomer;
-
-    return result;
   }
 
   /**
@@ -147,7 +174,7 @@ public class CustomerServiceRest {
   @Path(value = "/updateCustomerTotalMiles")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.APPLICATION_JSON)
-  public UpdateMilesResult updateCustomerTotalMiles(@HeaderParam("acmeair-id") String headerId,
+  public Response updateCustomerTotalMiles(@HeaderParam("acmeair-id") String headerId,
       @HeaderParam("acmeair-date") String headerDate, @HeaderParam("acmeair-sig-body") String headerSigBody,
       @HeaderParam("acmeair-signature") String headerSig,
       @FormParam("customerid") String customerid,  @FormParam("miles") Long miles) {
@@ -186,12 +213,14 @@ public class CustomerServiceRest {
       UpdateMilesResult result = new UpdateMilesResult();
       result.total_miles = milesUpdate;
 
-      return result;
+      return Response.ok(result).build();
 
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-      throw new InternalServerErrorException();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("Error: " + e.getLocalizedMessage())
+                     .build();
     }
   }
 

@@ -15,6 +15,9 @@
 *******************************************************************************/
 package com.acmeair.web;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class ValidateCustomerResponse {
-	public boolean validCustomer;
+    public boolean validCustomer;
 }
