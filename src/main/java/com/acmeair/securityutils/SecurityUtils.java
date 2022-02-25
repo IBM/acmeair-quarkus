@@ -38,18 +38,15 @@ import io.smallrye.jwt.auth.principal.DefaultJWTParser;
 import io.smallrye.jwt.auth.principal.JWTAuthContextInfo;
 import io.smallrye.jwt.build.Jwt;
 
-//@Component
 @ApplicationScoped
 public class SecurityUtils {
   
-//    @Value("${secure.service.calls:true}")
     @ConfigProperty(name = "secure.service.calls", defaultValue = "true")
     boolean SECURE_SERVICE_CALLS;
     
     /**
      * Accepts environment variable override SECURE_USER_CALLS
      */
-//    @Value("${secure.user.calls:true}")
     @ConfigProperty(name = "secure.user.calls", defaultValue = "true")
     boolean SECURE_USER_CALLS;
     
@@ -85,10 +82,6 @@ public class SecurityUtils {
 	public String generateJwt(String customerid) {
 		String token = null;
 		try {
-//			Algorithm algorithm = Algorithm.HMAC256(secretKey);
-//			token = JWT.create().withSubject(customerid).sign(algorithm);
-
-			// signWithSecret() uses HS256 algorithm by default
 			token = Jwt.claims().subject(customerid).signWithSecret(secretKey);
 		} catch (Exception exception) {
 			exception.printStackTrace();
@@ -107,11 +100,9 @@ public class SecurityUtils {
 		}
 
 		try {
-//			JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).build(); // Cache?
 			JWTAuthContextInfo authCtx = new JWTAuthContextInfo();
 			authCtx.setSignatureAlgorithm(SignatureAlgorithm.HS256);
 
-//			DecodedJWT jwt = verifier.verify(jwtToken);
 			JsonWebToken jwt = new DefaultJWTParser(authCtx).verify(jwtToken, secretKey);
 			return jwt.getSubject().equals(customerid);
 
