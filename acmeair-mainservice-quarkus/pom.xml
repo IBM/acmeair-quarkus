@@ -12,6 +12,8 @@
     <relativePath>..</relativePath>
   </parent>
   <properties>
+    <acmeair.docker.network>dummy-net</acmeair.docker.network>
+    <!-- <acmeair.docker.network default-value="my-net">${env.NETWORK}</acmeair.docker.network> -->
   </properties>
   <dependencies>
     <dependency>
@@ -71,6 +73,29 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
+      <plugin>
+        <!-- Build docker images for jvm using docker-compose -->
+        <artifactId>exec-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <version>${exec-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>/usr/bin/env</executable>
+              <arguments>
+                <argument>RUNTIME=jvm</argument>
+                <argument>NETWORK=${acmeair.docker.network}</argument>
+                <argument>docker-compose</argument>
+                <argument>build</argument>
+              </arguments> 
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
@@ -98,6 +123,29 @@
                     <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                     <maven.home>${maven.home}</maven.home>
                   </systemPropertyVariables>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- Build docker images for jvm using docker-compose -->
+            <artifactId>exec-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <version>${exec-plugin.version}</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>/usr/bin/env</executable>
+                  <arguments>
+                    <argument>RUNTIME=native</argument>
+                    <argument>NETWORK=${acmeair.docker.network}</argument>
+                    <argument>docker-compose</argument>
+                    <argument>build</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>
