@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: acmeair-bookingservice-quarkus-native
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: acmeair-booking-deployment
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: '9080'
+        prometheus.io/scrape: 'true'
+      labels:
+        name: acmeair-booking-deployment
+    spec:
+      containers:
+      - env:
+        - name: MONGO_HOST
+          value: acmeair-booking-db
+        - name: CUSTOMER_SERVICE
+          value: acmeair-nginx-service/customer
+        - name: FLIGHT_SERVICE
+          value: acmeair-nginx-service/flight
+        - name: TRACK_REWARD_MILES
+          value: 'true'
+        - name: SECURE_SERVICE_CALLS
+          value: 'true'
+        image: <YourImageRepository>/acmeair-bookingservice-quarkus:native
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /q/health/live
+            port: 9080
+          initialDelaySeconds: 120
+          periodSeconds: 15
+        name: acmeair-bookingservice-quarkus-native
+        ports:
+        - containerPort: 9080
+        - containerPort: 9443
+        readinessProbe:
+          httpGet:
+            path: /q/health/ready
+            port: 9080
+          initialDelaySeconds: 20
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: acmeair-bookingservice-quarkus
+  name: acmeair-bookingservice-quarkus
+spec:
+  ports:
+  - name: http
+    port: 9080
+  selector:
+    name: acmeair-booking-deployment

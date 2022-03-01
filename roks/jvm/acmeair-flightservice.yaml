@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: acmeair-flightservice-quarkus-jvm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: acmeair-flight-deployment
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: '9080'
+        prometheus.io/scrape: 'true'
+      labels:
+        name: acmeair-flight-deployment
+    spec:
+      containers:
+      - env:
+        - name: MONGO_HOST
+          value: acmeair-flight-db
+        - name: SECURE_SERVICE_CALLS
+          value: 'true'
+        image: <YourImageRepository>/acmeair-flightservice-quarkus:jvm
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /q/health/live
+            port: 9080
+          initialDelaySeconds: 120
+          periodSeconds: 15
+        name: acmeair-flightservice-quarkus-jvm
+        ports:
+        - containerPort: 9080
+        - containerPort: 9443
+        readinessProbe:
+          httpGet:
+            path: /q/health/ready
+            port: 9080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: 200Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: acmeair-flightservice-quarkus
+spec:
+  ports:
+  - name: http
+    port: 9080
+  selector:
+    name: acmeair-flight-deployment

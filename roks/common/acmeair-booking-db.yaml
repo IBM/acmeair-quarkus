@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: acmeair-booking-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: acmeair-booking-db
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: acmeair-booking-db
+    spec:
+      containers:
+      - image: mongo
+        name: acmeair-booking-db
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/configdb
+          name: acmeair-booking-db-1
+        - mountPath: /data/db
+          name: acmeair-booking-db-2
+      volumes:
+      - emptyDir: {}
+        name: acmeair-booking-db-1
+      - emptyDir: {}
+        name: acmeair-booking-db-2
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: acmeair-booking-db
+    service: acmeair-booking-db
+  name: acmeair-booking-db
+spec:
+  ports:
+  - name: '27017'
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    name: acmeair-booking-db
+status:
+  loadBalancer: {}

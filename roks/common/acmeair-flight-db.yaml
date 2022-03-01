@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: acmeair-flight-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: acmeair-flight-db
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: acmeair-flight-db
+    spec:
+      containers:
+      - image: mongo
+        name: acmeair-flight-db
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/configdb
+          name: acmeair-flight-db-1
+        - mountPath: /data/db
+          name: acmeair-flight-db-2
+      volumes:
+      - emptyDir: {}
+        name: acmeair-flight-db-1
+      - emptyDir: {}
+        name: acmeair-flight-db-2
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    service: acmeair-flight-db
+  name: acmeair-flight-db
+spec:
+  ports:
+  - name: '27017'
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    name: acmeair-flight-db
+status:
+  loadBalancer: {}

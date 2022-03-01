@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jmeter
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+      - image: <YourImageRepository>/acmeair-driver:latest
+        command:  ["./driver.sh"]
+        imagePullPolicy: Always
+        name: load-generator-jmeter
+        env:
+        - name: HOST
+          value: acmeair-nginx-service
+        - name: PORT
+          value: "80"
+        - name: DURATION       # Duration to send requests (in seconds)
+          value: "180"
+        - name: LOG_RESPONSE   # How to handle jmeter log after execution
+          value: null          #  do nothing
+#          value: "100"         #  prints last <n> lines
+#          value: "wait"        #  wait forever to let user insect or inspect to the pod
+      restartPolicy: Never

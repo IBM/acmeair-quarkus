@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: acmeair-customer-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: acmeair-customer-db
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: acmeair-customer-db
+    spec:
+      containers:
+      - image: mongo
+        name: acmeair-customer-db
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/configdb
+          name: acmeair-customer-db-1
+        - mountPath: /data/db
+          name: acmeair-customer-db-2
+      volumes:
+      - emptyDir: {}
+        name: acmeair-customer-db-1
+      - emptyDir: {}
+        name: acmeair-customer-db-2
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    service: acmeair-customer-db
+  name: acmeair-customer-db
+spec:
+  ports:
+  - name: '27017'
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    name: acmeair-customer-db
+status:
+  loadBalancer: {}
