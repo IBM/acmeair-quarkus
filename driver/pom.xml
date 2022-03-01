@@ -6,15 +6,28 @@
   <version>2.0.0-SNAPSHOT</version>
   <name>driver</name>
   <url>http://maven.apache.org</url>
+   <parent>
+    <groupId>com.acmeair</groupId>
+    <artifactId>acmeair-quarkus</artifactId>
+    <version>2.1.1-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
   <properties>
     <driver.image.nameWithRepo>acmeair-driver</driver.image.nameWithRepo>
     <driver.image.tag>latest</driver.image.tag>
-    <dockerfile-plugin.version>1.4.13</dockerfile-plugin.version>
   </properties>
   <dependencies>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>dockerfile-maven-plugin</artifactId>
@@ -24,15 +37,17 @@
             <id>default</id>
             <goals>
               <goal>build</goal>
-              <!-- <goal>push</goal> -->
+              <goal>push</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
+          <skip>false</skip>
           <contextDirectory>src/main/docker/</contextDirectory>
           <repository>${driver.image.nameWithRepo}</repository>
           <tag>${driver.image.tag}</tag>
           <buildArgs>
+            <!-- Can modify ARG values in Dockerfile as <ARG_NAME>value</ARG_NAME> -->
           </buildArgs>
         </configuration>
       </plugin>
