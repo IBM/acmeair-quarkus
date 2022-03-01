@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.acmeair</groupId>
+  <artifactId>driver</artifactId>
+  <version>2.0.0-SNAPSHOT</version>
+  <name>driver</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <driver.image.nameWithRepo>acmeair-driver</driver.image.nameWithRepo>
+    <driver.image.tag>latest</driver.image.tag>
+    <dockerfile-plugin.version>1.4.13</dockerfile-plugin.version>
+  </properties>
+  <dependencies>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>dockerfile-maven-plugin</artifactId>
+        <version>${dockerfile-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>default</id>
+            <goals>
+              <goal>build</goal>
+              <!-- <goal>push</goal> -->
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <contextDirectory>src/main/docker/</contextDirectory>
+          <repository>${driver.image.nameWithRepo}</repository>
+          <tag>${driver.image.tag}</tag>
+          <buildArgs>
+          </buildArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
