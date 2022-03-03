@@ -6,7 +6,7 @@ The components and their connections are depicted
 [here](https://github.com/blueperf/acmeair-mainservice-java/blob/main/images/AcmeairMS.png).
 
 Quarkus is a cloud native Java framework based on modern standard APIs.
-More information about its fancy features are available at [https://quarkus.io/](https://quarkus.io/).
+More information about its fancy features are available at https://quarkus.io/.
 
 This repository includes all five services of Acme Air, though the original five repositories are separated in
 the [BLUEPERF](https://github.com/blueperf) GitHub organization.
@@ -16,12 +16,12 @@ on a local machine or OpneShift cloud environment.
 
 ## Build Instructions
 
-##### Clone git repo
+### Clone git repo
 ```shell
 git clone https://github.com/IBM/acmeair-quarkus.git
 ```
 
-##### Building the application
+### Building the application
 ```shell
 cd acmeair-quarkus
 mvn package
@@ -32,7 +32,7 @@ It also creates a docker image of the driver, a load generator by using Apache J
 The scenario and its JMeter plugin are found in [acmeair-driver](https://github.com/blueperf/acmeair-driver)
 repository in BLUEPERF.
 
-##### Creating a native executable if interested
+### Creating a native executable if interested
 
 One of a major feature of Quarkus is native binary support. You can build the five microservices as native binaries
 by adding `-Pnative` in the Maven command line:
@@ -46,10 +46,10 @@ and `acmeair-mainservice-quarkus:native` is a native version.
 
 ## Usage Instructions
 
-##### Setting up docker network
+### Setting up docker network
 
-Make sure you correctly installed docker, docker-compose, and start docker daemon on your local machine.
-The instruction is available [here](https://docs.docker.com/installation/).
+Make sure you correctly installed docker engine and docker-compose, and start docker daemon on your machine.
+The instruction is available [here](https://docs.docker.com/engine/install/).  
 
 Then, create docker network for connecting the microservices and other components:
 ```shell
@@ -57,14 +57,14 @@ docker network create --driver bridge my-net
 ```
 You can pick any name for the network. `my-net` is just an example.
 
-##### Starting the application
+### Starting the application
 
 Use docker-compose to start containers of all five microservices, three mongodb instances, and an nginx proxy:
 ```shell
 NETWORK=my-net docker-compose -f acmeair-mainservice-quarkus/docker-compose.yml up
 ```
 
-##### Verifying the application manually
+### Verifying the application manually
 
 1. Access http://localhost/acmeair with your browser.
 2. Click **a link at the bottom of the page** and go to the **Acme Air Configuration information** page.
@@ -72,6 +72,6 @@ NETWORK=my-net docker-compose -f acmeair-mainservice-quarkus/docker-compose.yml 
 
 The application is ready if no error is reported.
 
-##### Measuring performance using the driver
+### Measuring performance using the driver
 
 The instruction to use driver is described in [driver/Readme.md](driver/Readme.md).
